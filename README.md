@@ -2,6 +2,8 @@
 
 > Ask once. Compare all. Choose the best.
 
+**中文简介**：一个 AI 回答对比工具。输入一个问题，同时发送给多个大模型（GPT-4o、Claude、Gemini 等），自动分析各模型回答的风格和内容差异，帮你快速选出最合适的答案。
+
 Smarter AI lets you send a single prompt to multiple LLMs simultaneously (GPT-4o, Claude 3.5, Gemini Pro, DeepSeek V3), then surfaces a smart **difference summary** — so you spend less time reading and more time deciding.
 
 ---
