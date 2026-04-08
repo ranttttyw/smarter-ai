@@ -2,40 +2,39 @@
 
 > Ask once. Compare all. Choose the best.
 
-**中文简介**：一个 AI 回答对比工具。输入一个问题，同时发送给多个大模型（GPT-4o、Claude、Gemini 等），自动分析各模型回答的风格和内容差异，帮你快速选出最合适的答案。
-
 Smarter AI lets you send a single prompt to multiple LLMs simultaneously (GPT-4o, Claude 3.5, Gemini Pro, DeepSeek V3), then surfaces a smart **difference summary** — so you spend less time reading and more time deciding.
+AI 回答对比工具。输入一个问题，同时发送给多个大模型（GPT-4o、Claude、Gemini 等），自动分析各模型回答的风格和内容差异，帮你快速选出最合适的答案。
 
 ---
 
 ## Why this exists
 
-Most people use only one AI model, not because it's the best for every task, but because switching between tabs is friction. Smarter AI removes that friction by running your query in parallel across models and highlighting *what's actually different* between their answers.
+Most people use only one AI model, not because it's the best for every task, but because switching between tabs is friction. Smarter AI removes that friction by running your query in parallel across models and highlighting _what's actually different_ between their answers.
 
 ---
 
 ## Core Features
 
-| Feature | Description |
-|---|---|
-| ⚡ Parallel querying | Sends your prompt to up to 3 models simultaneously |
-| 🔍 Difference summary | AI-generated analysis of *how* models differ, not just what they say |
-| 📊 Style analysis | Detects length, structure, tone, and information density per model |
+| Feature                | Description                                                              |
+| ---------------------- | ------------------------------------------------------------------------ |
+| ⚡ Parallel querying   | Sends your prompt to up to 3 models simultaneously                       |
+| 🔍 Difference summary  | AI-generated analysis of _how_ models differ, not just what they say     |
+| 📊 Style analysis      | Detects length, structure, tone, and information density per model       |
 | ✅ One-click selection | Choose the answer you want, then continue in that model or ask all again |
-| 📈 Preference tracking | Tracks which models you've favored over time (stored locally) |
+| 📈 Preference tracking | Tracks which models you've favored over time (stored locally)            |
 
 ---
 
 ## Tech Stack
 
-| Layer | Tech |
-|---|---|
-| Frontend | HTML / CSS / Vanilla JS (prototype) → React (v2) |
-| Backend | Node.js + Express |
-| AI APIs | OpenAI, Anthropic, Google Gemini |
+| Layer    | Tech                                                 |
+| -------- | ---------------------------------------------------- |
+| Frontend | HTML / CSS / Vanilla JS (prototype) → React (v2)     |
+| Backend  | Node.js + Express                                    |
+| AI APIs  | OpenAI, Anthropic, Google Gemini                     |
 | Analysis | GPT-4o-mini meta-prompt for difference summarization |
-| Storage | localStorage (v1) → Supabase (v2) |
-| Deploy | Vercel (frontend) + Railway (backend) |
+| Storage  | localStorage (v1) → Supabase (v2)                    |
+| Deploy   | Vercel (frontend) + Railway (backend)                |
 
 ---
 
@@ -94,7 +93,7 @@ This project was designed using a PM-first approach:
 
 - **Target user**: Knowledge workers who use AI daily and want to pick the right model for each task
 - **Core metric**: Selection rate (% of comparisons where user actively chooses a model)
-- **Key differentiator**: Difference summary layer — competitors (Nat.dev, Poe, Chatbot Arena) show raw outputs side-by-side; Smarter AI tells you *what's actually different*
+- **Key differentiator**: Difference summary layer — competitors (Nat.dev, Poe, Chatbot Arena) show raw outputs side-by-side; Smarter AI tells you _what's actually different_
 
 See [`docs/PRD.md`](./docs/PRD.md) for full product requirements.
 
