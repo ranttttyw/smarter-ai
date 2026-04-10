@@ -269,7 +269,7 @@
         <button class="pref-toggle-btn" onclick="togglePrefPanel()" id="prefToggleBtn">
             <span class="pref-dot" id="prefDot"></span>📊 我的偏好记录
         </button>
-        <div class="header-badge">原型演示</div>
+        <div class="header-badge">写作对比</div>
     </div>
 </header>
 
@@ -291,12 +291,12 @@
     <div class="query-section">
         <div class="query-label">你的问题</div>
         <textarea class="query-input" id="queryInput" rows="3"
-            placeholder="输入你想问所有 AI 的问题，比如：中国 AI PM 的工作是什么？"></textarea>
+            placeholder="描述你的写作需求，比如：帮我写一篇小红书种草文案，介绍一款抹茶拿铁..."></textarea>
         <div class="presets-row">
             <span class="preset-label">试试：</span>
-            <button class="preset-btn" onclick="setPreset(0)">中国 AI PM 的工作是什么？</button>
-            <button class="preset-btn" onclick="setPreset(1)">如何提高工作效率？</button>
-            <button class="preset-btn" onclick="setPreset(2)">Python 还是 JS 更适合初学者？</button>
+            <button class="preset-btn" onclick="setPreset(0)">小红书：一个人去京都旅行</button>
+            <button class="preset-btn" onclick="setPreset(1)">拒绝 offer 的邮件</button>
+            <button class="preset-btn" onclick="setPreset(2)">AI 工具产品介绍</button>
         </div>
         <div class="model-selector-row">
             <div class="chips-group">
@@ -339,23 +339,25 @@
 //  模型配置
 // ══════════════════════════════════════════════════════
 const MODELS = [
-    { id: 'gpt4o',    name: 'GPT-4o',      org: 'OpenAI',    c: '#10a37f', bg: '#f0fdf4', shadow: 'rgba(16,163,127,0.12)',  icon: 'G' },
-    { id: 'claude',   name: 'Claude 3.5',  org: 'Anthropic', c: '#d97706', bg: '#fffbeb', shadow: 'rgba(217,119,6,0.12)',   icon: 'C' },
-    { id: 'gemini',   name: 'Gemini Pro',  org: 'Google',    c: '#4285f4', bg: '#eff6ff', shadow: 'rgba(66,133,244,0.12)',  icon: 'G' },
-    { id: 'deepseek', name: 'DeepSeek V3', org: 'DeepSeek',  c: '#7c3aed', bg: '#f5f3ff', shadow: 'rgba(124,58,237,0.12)', icon: 'D' },
-    { id: 'llama',    name: 'Llama 3.1',   org: 'Meta',      c: '#0369a1', bg: '#f0f9ff', shadow: 'rgba(3,105,161,0.12)',   icon: 'L' },
+    { id: 'gemini',   name: 'Gemini Flash', org: 'Google',   c: '#4285f4', bg: '#eff6ff', shadow: 'rgba(66,133,244,0.12)',  icon: 'G' },
+    { id: 'deepseek', name: 'DeepSeek V3',  org: 'DeepSeek', c: '#7c3aed', bg: '#f5f3ff', shadow: 'rgba(124,58,237,0.12)', icon: 'D' },
 ];
 
 const PRESETS = [
-    "中国 AI PM 的工作是什么？",
-    "如何提高工作效率？",
-    "Python 还是 JS 更适合初学者？",
+    "帮我写一篇小红书种草文案，主题是「一个人去京都旅行」",
+    "给我写一封拒绝 offer 的邮件，语气委婉但坚定",
+    "帮我写一段产品介绍，介绍一款帮助学生备考的 AI 工具",
 ];
 
 // ══════════════════════════════════════════════════════
-//  MOCK 数据
+//  TAG TYPE → CSS CLASS
 // ══════════════════════════════════════════════════════
-const MOCK = {
+function tagClass(type) {
+    const map = { tone: 't-orange', structure: 't-blue', quality: 't-green', warning: 't-red' };
+    return map[type] || 't-gray';
+}
+
+const REMOVED_MOCK = {
 
 "中国 AI PM 的工作是什么？": {
     summary: "三个模型对「中国 AI PM」的描述侧重点明显不同。GPT-4o 给出了最完整的职责框架，包含从需求到落地的全流程；Claude 着重点出了中国市场特有的挑战（合规、数据主权、模型国产化压力）；Gemini 最直接，给出了招聘 JD 里高频出现的硬技能清单。关键分歧：是否需要技术背景——GPT-4o 和 Gemini 认为要懂大模型，Claude 认为业务判断力比技术更关键。",
@@ -468,7 +470,7 @@ const MOCK = {
     }
 }
 
-}; // MOCK end
+}; // end placeholder (not used)
 
 // ══════════════════════════════════════════════════════
 //  STATE
@@ -677,24 +679,50 @@ function startCompare() {
         </div>`;
     }).join('');
 
-    setTimeout(() => {
+    // Real API call
+    fetch('http://localhost:3001/api/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: q, models: selected })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error(`服务器返回 ${res.status}`);
+        return res.json();
+    })
+    .then(data => {
         ls.style.display = 'none';
-        renderResults(q);
-    }, 1600);
+        renderResults(data);
+    })
+    .catch(err => {
+        ls.style.display = 'none';
+        showToast('❌ 请求失败：' + err.message + '（请确认后端服务正在运行）');
+        console.error(err);
+    });
 }
 
 // ══════════════════════════════════════════════════════
-//  RENDER RESULTS
+//  RENDER RESULTS  (takes real API response object)
 // ══════════════════════════════════════════════════════
-function renderResults(q) {
-    const data = MOCK[q] || buildGeneric(q);
+function renderResults(apiData) {
+    // apiData = { results: [{modelId, content, error}], analysis: {summary, chips, models} }
+    const analysis = apiData.analysis || {};
+    const contentMap = {};
+    (apiData.results || []).forEach(r => { contentMap[r.modelId] = r; });
+
     const rs = document.getElementById('resultsSection');
     rs.style.display = 'block';
 
-    document.getElementById('summaryCard').innerHTML = `
-        <div class="summary-eyebrow">🔍 差异总结</div>
-        <div class="summary-text">${data.summary}</div>
-        <div class="summary-chips">${data.chips.map(c => `<span class="summary-chip">${c}</span>`).join('')}</div>`;
+    // Summary card
+    if (analysis.summary) {
+        document.getElementById('summaryCard').innerHTML = `
+            <div class="summary-eyebrow">🔍 差异总结</div>
+            <div class="summary-text">${analysis.summary}</div>
+            <div class="summary-chips">${(analysis.chips || []).map(c => `<span class="summary-chip">${c}</span>`).join('')}</div>`;
+    } else {
+        document.getElementById('summaryCard').innerHTML = `
+            <div class="summary-eyebrow">🔍 差异总结</div>
+            <div class="summary-text">分析完成，请展开各模型回答查看详情。</div>`;
+    }
 
     const grid = document.getElementById('modelsGrid');
     grid.style.gridTemplateColumns = `repeat(${selected.length}, 1fr)`;
@@ -702,7 +730,22 @@ function renderResults(q) {
 
     selected.forEach(id => {
         const m = MODELS.find(x => x.id === id);
-        const d = (data.models && data.models[id]) || buildGenericModel(id, selected.indexOf(id));
+        const resultEntry = contentMap[id] || {};
+        const modelAnalysis = (analysis.models && analysis.models[id]) || {};
+
+        // Build tags from real API: [{label, type}] → [{t, c}]
+        const tags = (modelAnalysis.tags || []).map(tag => ({
+            t: tag.label,
+            c: tagClass(tag.type)
+        }));
+
+        // Stats from real API: {创意度: 80, ...}
+        const stats = modelAnalysis.stats || {};
+
+        const keyPoint = modelAnalysis.keyPoint || '';
+        const fullAnswer = resultEntry.error
+            ? `⚠️ 请求失败：${resultEntry.error}`
+            : (resultEntry.content || '');
 
         const col = document.createElement('div');
         col.className = 'model-col';
@@ -710,6 +753,17 @@ function renderResults(q) {
         col.style.setProperty('--c', m.c);
         col.style.setProperty('--bg', m.bg);
         col.style.setProperty('--shadow', m.shadow);
+
+        const statsHtml = Object.keys(stats).length > 0
+            ? `<div class="stats-grid">${Object.entries(stats).map(([k,v])=>`
+                <div class="stat-item">
+                    <div class="stat-name">${k}</div>
+                    <div class="stat-bar-row">
+                        <div class="stat-bar"><div class="stat-fill" style="width:${v}%;background:${m.c};"></div></div>
+                        <div class="stat-val">${v}%</div>
+                    </div>
+                </div>`).join('')}</div>`
+            : '';
 
         col.innerHTML = `
             <div class="col-header">
@@ -720,25 +774,18 @@ function renderResults(q) {
             </div>
             <div class="col-analysis">
                 <div class="analysis-label">内容 & 风格分析</div>
-                <div class="tags-row">${d.tags.map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('')}</div>
-                <div class="stats-grid">${Object.entries(d.stats).map(([k,v])=>`
-                    <div class="stat-item">
-                        <div class="stat-name">${k}</div>
-                        <div class="stat-bar-row">
-                            <div class="stat-bar"><div class="stat-fill" style="width:${v}%;background:${m.c};"></div></div>
-                            <div class="stat-val">${v}%</div>
-                        </div>
-                    </div>`).join('')}</div>
+                <div class="tags-row">${tags.map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('')}</div>
+                ${statsHtml}
             </div>
-            <div class="col-keypoint">
+            ${keyPoint ? `<div class="col-keypoint">
                 <div class="keypoint-label">⚡ 核心亮点</div>
-                <div class="keypoint-text">${d.keyPoint}</div>
-            </div>
+                <div class="keypoint-text">${keyPoint}</div>
+            </div>` : ''}
             <div class="col-answer">
                 <button class="expand-toggle" id="toggle-${id}" onclick="toggleAnswer('${id}')">
                     <span class="arrow">▾</span> 展开完整回答
                 </button>
-                <div class="full-answer-content" id="answer-${id}">${fmt(d.fullAnswer)}</div>
+                <div class="full-answer-content" id="answer-${id}">${fmt(fullAnswer)}</div>
             </div>
             <div class="col-select">
                 <button class="select-btn" id="selbtn-${id}" onclick="chooseModel('${id}')">选择这个回答</button>
@@ -806,44 +853,6 @@ function deepDive() {
     showToast(`正在进入 ${m.name} 深度对话模式…`);
 }
 
-// ══════════════════════════════════════════════════════
-//  GENERIC FALLBACK（非预置问题时）
-// ══════════════════════════════════════════════════════
-function buildGeneric(q) {
-    const topic = q.replace(/[？?。！!]/g, '').substring(0, 15);
-    return {
-        summary: `针对「${topic}」，三个模型从不同角度给出了回答。整体来看：结构化程度最高的模型给出了框架性分析，注重实用的模型侧重可操作的建议，简洁型模型则直击核心并指出常见误区。展开完整回答可查看详细内容。`,
-        chips: ["框架 vs 实用 vs 简洁", "切入视角各有不同", "可展开查看完整内容"],
-        models: Object.fromEntries(selected.map((id, i) => [id, buildGenericModel(id, i)]))
-    };
-}
-
-function buildGenericModel(id, idx) {
-    const q = document.getElementById('queryInput').value.trim();
-    const topic = q.replace(/[？?。！!]/g, '').substring(0, 20);
-    const m = MODELS.find(x => x.id === id);
-    const variants = [
-        {
-            tags: [{t:"详细",c:"t-blue"},{t:"结构化",c:"t-green"},{t:"正式语气",c:"t-purple"}],
-            stats: { "回答长度": 82, "信息密度": 78, "正式程度": 85, "结构化": 92 },
-            keyPoint: `给出了关于「${topic}」的完整框架性分析，包含多个维度和具体可执行步骤，适合需要系统性方法论的用户`,
-            fullAnswer: `**关于「${topic}」的系统分析**\n\n这是一个值得从多个维度思考的问题。\n\n**核心维度一：基础认知**\n首先需要理解背后的核心逻辑和底层原理。很多人在这个问题上容易走弯路，主要是因为对前提假设理解不够清晰。\n\n**核心维度二：实操方法**\n- 第一步：明确你的目标和约束条件\n- 第二步：拆解问题，找到关键变量\n- 第三步：制定可验证的行动计划\n- 第四步：定期复盘和调整\n\n**核心维度三：常见误区**\n许多人在「${topic}」这件事上容易陷入「努力但没有方向」的陷阱，建议先花时间想清楚目标，再开始执行。\n\n**总结**\n综合来看，把握核心逻辑、制定清晰计划、持续迭代，是处理这类问题最有效的方式。`
-        },
-        {
-            tags: [{t:"适中",c:"t-green"},{t:"实用导向",c:"t-orange"},{t:"温和语气",c:"t-blue"}],
-            stats: { "回答长度": 60, "信息密度": 65, "正式程度": 52, "结构化": 63 },
-            keyPoint: `从用户实际需求出发，提供了关于「${topic}」的可立即执行的具体建议，并分享了真实场景中的注意事项`,
-            fullAnswer: `关于「${topic}」，我想先从实际的角度来思考这个问题。\n\n这类问题通常没有一个标准答案，但有一些被验证有效的思路可以参考：\n\n**最重要的一点**\n不要试图一次性解决所有问题。把「${topic}」这件事拆成几个更小的子问题，逐一击破，往往比整体推进效果更好。\n\n**实际操作建议**\n从你最有把握的部分开始，建立初步的正反馈。很多人在面对「${topic}」时容易想太多、做太少。\n\n**一个值得思考的问题**\n你在「${topic}」这件事上，最大的障碍是什么？是信息不够、资源不够、还是不知道怎么开始？不同的障碍需要不同的解法。\n\n总的来说，保持行动是最重要的。完善的计划永远等不来，先迈出第一步，在实践中调整。`
-        },
-        {
-            tags: [{t:"简洁",c:"t-green"},{t:"直接",c:"t-blue"},{t:"⚠️ 有提示",c:"t-red"}],
-            stats: { "回答长度": 40, "信息密度": 74, "正式程度": 33, "结构化": 58 },
-            keyPoint: `用最少的话说清楚了「${topic}」的核心要点，并主动指出了一个常见误区，信息密度最高`,
-            fullAnswer: `关于「${topic}」，直接说几个关键点：\n\n✅ **最关键的事**：搞清楚你真正要解决的问题是什么，很多人在错误的问题上花了大量时间。\n\n✅ **次关键的事**：找到一个可以快速验证的最小方案，先试错，再优化。\n\n✅ **容易忽略的事**：收集反馈，不要闭门造车。\n\n⚠️ **常见误区**：在「${topic}」这件事上，最常见的问题是「过度准备，推迟行动」。完美方案是行动的敌人。\n\n就这些，其他都是细节，边做边学。`
-        }
-    ];
-    return variants[idx % variants.length];
-}
 
 // ══════════════════════════════════════════════════════
 //  TOAST
