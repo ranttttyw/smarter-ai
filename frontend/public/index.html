@@ -713,15 +713,16 @@ function renderResults(apiData) {
     rs.style.display = 'block';
 
     // Summary card
-    if (analysis.summary) {
-        document.getElementById('summaryCard').innerHTML = `
+    const summaryEl = document.getElementById('summaryCard');
+    if (analysis && analysis.summary) {
+        summaryEl.style.display = '';
+        summaryEl.innerHTML = `
             <div class="summary-eyebrow">🔍 差异总结</div>
             <div class="summary-text">${analysis.summary}</div>
             <div class="summary-chips">${(analysis.chips || []).map(c => `<span class="summary-chip">${c}</span>`).join('')}</div>`;
     } else {
-        document.getElementById('summaryCard').innerHTML = `
-            <div class="summary-eyebrow">🔍 差异总结</div>
-            <div class="summary-text">分析完成，请展开各模型回答查看详情。</div>`;
+        // Single model or analysis failed — hide the summary card, show full answer directly
+        summaryEl.style.display = 'none';
     }
 
     const grid = document.getElementById('modelsGrid');
@@ -765,6 +766,9 @@ function renderResults(apiData) {
                 </div>`).join('')}</div>`
             : '';
 
+        const isSingleModel = selected.length === 1;
+        const hasAnalysis = !!(analysis && analysis.models && analysis.models[id]);
+
         col.innerHTML = `
             <div class="col-header">
                 <div class="col-model-info">
@@ -772,20 +776,21 @@ function renderResults(apiData) {
                     <div><div class="col-name">${m.name}</div><div class="col-provider">${m.org}</div></div>
                 </div>
             </div>
+            ${hasAnalysis ? `
             <div class="col-analysis">
                 <div class="analysis-label">内容 & 风格分析</div>
                 <div class="tags-row">${tags.map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('')}</div>
                 ${statsHtml}
             </div>
             ${keyPoint ? `<div class="col-keypoint">
-                <div class="keypoint-label">⚡ 核心亮点</div>
+                <div class="keypoint-label">⚡ 核心摘要</div>
                 <div class="keypoint-text">${keyPoint}</div>
-            </div>` : ''}
+            </div>` : ''}` : ''}
             <div class="col-answer">
-                <button class="expand-toggle" id="toggle-${id}" onclick="toggleAnswer('${id}')">
+                ${isSingleModel ? '' : `<button class="expand-toggle" id="toggle-${id}" onclick="toggleAnswer('${id}')">
                     <span class="arrow">▾</span> 展开完整回答
-                </button>
-                <div class="full-answer-content" id="answer-${id}">${fmt(fullAnswer)}</div>
+                </button>`}
+                <div class="full-answer-content ${isSingleModel ? 'open' : ''}" id="answer-${id}">${fmt(fullAnswer)}</div>
             </div>
             <div class="col-select">
                 <button class="select-btn" id="selbtn-${id}" onclick="chooseModel('${id}')">选择这个回答</button>
