@@ -864,7 +864,7 @@ function renderResults(apiData) {
             </div>` : ''}
             <div class="col-answer">
                 ${isSingleModel ? '' : `<button class="expand-toggle" id="toggle-${id}" onclick="toggleAnswer('${id}')">
-                    <span class="arrow">▾</span> 展开完整回答
+                    <span class="arrow">↓</span> 展开完整回答
                 </button>`}
                 <div class="full-answer-content ${isSingleModel ? 'open' : ''}" id="answer-${id}">${fmt(fullAnswer)}</div>
             </div>
