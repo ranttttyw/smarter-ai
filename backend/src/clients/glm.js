@@ -41,7 +41,7 @@ async function queryGLM(prompt) {
   });
 
   const response = await client.chat.completions.create({
-    model: 'glm-4-flash',
+    model: 'glm-4.7-flash',
     messages: [{ role: 'user', content: prompt }],
     max_tokens: 1000,
   });

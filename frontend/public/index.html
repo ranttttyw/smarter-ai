@@ -255,9 +255,69 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* DEEP CHAT */
+        .chat-section {
+            display: none; margin-top: 16px; background: white; border-radius: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+            border: 2px solid #e0e7ff; max-width: 720px; margin-left: auto; margin-right: auto;
+        }
+        .chat-section.show { display: block; }
+        .chat-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid #f3f4f6; background: #fafafe;
+        }
+        .chat-header-left { display: flex; align-items: center; gap: 12px; }
+        .chat-model-icon {
+            width: 36px; height: 36px; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center; color: white;
+            font-weight: 800; font-size: 14px;
+        }
+        .chat-model-name { font-weight: 700; font-size: 14px; color: #1f2937; }
+        .chat-model-org { font-size: 11px; color: #9ca3af; }
+        .chat-back-btn {
+            background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 10px;
+            font-size: 12px; color: #6b7280; cursor: pointer; font-weight: 600;
+            font-family: inherit; transition: all 0.15s;
+        }
+        .chat-back-btn:hover { background: #e5e7eb; }
+        .chat-messages {
+            padding: 20px; min-height: 200px; max-height: 500px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 16px;
+        }
+        .chat-bubble {
+            max-width: 85%; padding: 12px 16px; border-radius: 16px;
+            font-size: 13.5px; line-height: 1.7; word-break: break-word;
+        }
+        .chat-bubble.user {
+            align-self: flex-end; background: #6366f1; color: white; border-bottom-right-radius: 4px;
+        }
+        .chat-bubble.assistant {
+            align-self: flex-start; background: #f3f4f6; color: #1f2937; border-bottom-left-radius: 4px;
+        }
+        .chat-bubble.assistant strong { color: #111827; }
+        .chat-input-row {
+            display: flex; gap: 10px; padding: 16px 20px; border-top: 1px solid #f3f4f6;
+            background: #fafafe;
+        }
+        .chat-input {
+            flex: 1; border: 2px solid #e5e7eb; border-radius: 12px; padding: 10px 14px;
+            font-size: 13px; font-family: inherit; resize: none; outline: none;
+            transition: border-color 0.15s;
+        }
+        .chat-input:focus { border-color: #6366f1; }
+        .chat-send-btn {
+            padding: 10px 20px; background: #6366f1; color: white; border: none;
+            border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+            font-family: inherit; transition: all 0.15s; align-self: flex-end;
+        }
+        .chat-send-btn:hover { background: #4f46e5; }
+        .chat-send-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+        .chat-typing { color: #9ca3af; font-size: 12px; font-style: italic; }
+
         @media (max-width: 900px) {
             .models-grid { grid-template-columns: 1fr !important; }
             .loading-grid { grid-template-columns: 1fr !important; }
+            .chat-section { margin-top: 12px; }
         }
     </style>
 </head>
@@ -331,6 +391,25 @@
         </div>
     </div>
 
+    <!-- Deep Chat -->
+    <div class="chat-section" id="chatSection">
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <div class="chat-model-icon" id="chatModelIcon"></div>
+                <div>
+                    <div class="chat-model-name" id="chatModelName"></div>
+                    <div class="chat-model-org" id="chatModelOrg"></div>
+                </div>
+            </div>
+            <button class="chat-back-btn" onclick="exitChat()">← 返回对比</button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-row">
+            <textarea class="chat-input" id="chatInput" rows="2" placeholder="继续聊…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+            <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">发送</button>
+        </div>
+    </div>
+
 </div>
 <div class="toast" id="toast"></div>
 
@@ -341,7 +420,7 @@
 const MODELS = [
     { id: 'gemini',   name: 'Gemini Flash', org: 'Google',   c: '#4285f4', bg: '#eff6ff', shadow: 'rgba(66,133,244,0.12)',  icon: 'G' },
     { id: 'deepseek', name: 'DeepSeek V3',  org: 'DeepSeek', c: '#7c3aed', bg: '#f5f3ff', shadow: 'rgba(124,58,237,0.12)', icon: 'D' },
-    { id: 'glm',      name: 'GLM-4-Flash',  org: '智谱 AI',  c: '#0d9488', bg: '#f0fdfa', shadow: 'rgba(13,148,136,0.12)',  icon: 'Z' },
+    { id: 'glm',      name: 'GLM-4.7',      org: '智谱 AI',  c: '#0d9488', bg: '#f0fdfa', shadow: 'rgba(13,148,136,0.12)',  icon: 'Z' },
 ];
 
 const PRESETS = [
@@ -849,12 +928,94 @@ function continueAll() {
     showToast('已清空，输入新问题继续对比 ✓');
 }
 
+// ══════════════════════════════════════════════════════
+//  DEEP CHAT
+// ══════════════════════════════════════════════════════
+let chatModel = null;
+let chatHistory = []; // [{role: 'user'|'assistant', content}]
+
 function deepDive() {
     if (!chosen) return;
-    const m = MODELS.find(x => x.id === chosen);
-    showToast(`正在进入 ${m.name} 深度对话模式…`);
+    chatModel = chosen;
+    chatHistory = [];
+
+    const m = MODELS.find(x => x.id === chatModel);
+    document.getElementById('chatModelIcon').textContent = m.icon;
+    document.getElementById('chatModelIcon').style.background = m.c;
+    document.getElementById('chatModelName').textContent = `与 ${m.name} 深聊`;
+    document.getElementById('chatModelOrg').textContent = m.org;
+
+    // Seed chat with original question + model's first answer
+    const firstAnswer = document.getElementById(`answer-${chatModel}`)?.innerText || '';
+    chatHistory.push({ role: 'user', content: currentQ });
+    chatHistory.push({ role: 'assistant', content: firstAnswer });
+
+    const msgBox = document.getElementById('chatMessages');
+    msgBox.innerHTML = '';
+    addChatBubble('user', currentQ);
+    addChatBubble('assistant', firstAnswer);
+
+    // Hide compare view, show chat
+    document.getElementById('resultsSection').style.display = 'none';
+    document.querySelector('.query-section').style.display = 'none';
+    document.getElementById('chatSection').classList.add('show');
+    document.getElementById('chatInput').focus();
 }
 
+function exitChat() {
+    document.getElementById('chatSection').classList.remove('show');
+    document.getElementById('resultsSection').style.display = 'block';
+    document.querySelector('.query-section').style.display = '';
+    chatModel = null;
+    chatHistory = [];
+}
+
+function addChatBubble(role, text) {
+    const msgBox = document.getElementById('chatMessages');
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${role}`;
+    bubble.innerHTML = role === 'assistant' ? fmt(text) : esc(text).replace(/\n/g, '<br>');
+    msgBox.appendChild(bubble);
+    msgBox.scrollTop = msgBox.scrollHeight;
+    return bubble;
+}
+
+async function sendChat() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg || !chatModel) return;
+
+    input.value = '';
+    chatHistory.push({ role: 'user', content: msg });
+    addChatBubble('user', msg);
+
+    // Show typing indicator
+    const typing = document.createElement('div');
+    typing.className = 'chat-bubble assistant chat-typing';
+    typing.textContent = '思考中…';
+    document.getElementById('chatMessages').appendChild(typing);
+    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+    document.getElementById('chatSendBtn').disabled = true;
+
+    try {
+        const res = await fetch('http://localhost:3001/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: chatModel, messages: chatHistory })
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        typing.remove();
+        chatHistory.push({ role: 'assistant', content: data.content });
+        addChatBubble('assistant', data.content);
+    } catch (err) {
+        typing.remove();
+        addChatBubble('assistant', `⚠️ 请求失败：${err.message}`);
+    }
+    document.getElementById('chatSendBtn').disabled = false;
+    document.getElementById('chatInput').focus();
+}
 
 // ══════════════════════════════════════════════════════
 //  TOAST
