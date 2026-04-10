@@ -2,8 +2,8 @@ const { queryDeepSeek } = require('../clients/deepseek');
 
 /**
  * Analyze writing responses.
- * - 1 model: per-model breakdown only (no comparison summary)
- * - 2+ models: per-model breakdown + cross-model comparison summary
+ * - 1 model: per-model breakdown, summary = single-model notice
+ * - 2+ models: per-model breakdown + substantive cross-model comparison
  */
 async function analyzeResults(prompt, results) {
   const validResults = results.filter(r => r.content && !r.error);
@@ -23,9 +23,10 @@ async function analyzeResults(prompt, results) {
     .join('\n\n---\n\n');
 
   const summaryInstruction = isSingleModel
-    ? `"summary": null,\n  "chips": [],`
-    : `"summary": "一句话点出各模型最核心的差异，比较切入角度或风格（40字以内）",
-  "chips": ["差异点1（5字以内）", "差异点2（5字以内）", "差异点3（5字以内）"],`;
+    ? `"summary": "当前仅选择了单一模型，以下为该模型的写作风格与内容分析",
+  "chips": [],`
+    : `"summary": "指出各模型在切入角度、内容重点或写作风格上最有价值的差异。重点传递有用的判断依据，不要因为字数限制而省略关键信息（可写80-120字）",
+  "chips": ["差异点1（6字以内）", "差异点2（6字以内）", "差异点3（6字以内）"],`;
 
   const analysisPrompt = `
 你是写作风格分析专家。用户的写作请求是：
@@ -49,7 +50,7 @@ ${responsesText}
         例如写邮件：专业度/礼貌感/清晰度/简洁度
         例如写产品介绍：说服力/差异化/可信度/简洁度
       },
-      "keyPoint": "一句话概括这个回答的核心内容或主要立场（不是描述风格，30字以内）"
+      "keyPoint": "概括这个回答最重要的内容、立场或做法。目标是让读者不用展开全文就能判断这个回答适不适合自己，字数不是关键，传递最核心的信息才是关键"
     }
   }
 }

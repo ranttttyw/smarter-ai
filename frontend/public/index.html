@@ -712,18 +712,16 @@ function renderResults(apiData) {
     const rs = document.getElementById('resultsSection');
     rs.style.display = 'block';
 
-    // Summary card
+    // Summary card — always shown
     const summaryEl = document.getElementById('summaryCard');
-    if (analysis && analysis.summary) {
-        summaryEl.style.display = '';
-        summaryEl.innerHTML = `
-            <div class="summary-eyebrow">🔍 差异总结</div>
-            <div class="summary-text">${analysis.summary}</div>
-            <div class="summary-chips">${(analysis.chips || []).map(c => `<span class="summary-chip">${c}</span>`).join('')}</div>`;
-    } else {
-        // Single model or analysis failed — hide the summary card, show full answer directly
-        summaryEl.style.display = 'none';
-    }
+    summaryEl.style.display = '';
+    const summaryText = (analysis && analysis.summary) || '分析完成，请查看下方各模型回答。';
+    const chips = (analysis && analysis.chips) || [];
+    const eyebrow = selected.length === 1 ? '📋 分析总览' : '🔍 差异总结';
+    summaryEl.innerHTML = `
+        <div class="summary-eyebrow">${eyebrow}</div>
+        <div class="summary-text">${summaryText}</div>
+        ${chips.length ? `<div class="summary-chips">${chips.map(c => `<span class="summary-chip">${c}</span>`).join('')}</div>` : ''}`;
 
     const grid = document.getElementById('modelsGrid');
     grid.style.gridTemplateColumns = `repeat(${selected.length}, 1fr)`;
