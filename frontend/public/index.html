@@ -845,32 +845,49 @@ function renderResults(apiData) {
             : '';
 
         const isSingleModel = selected.length === 1;
+        const hasError = !!resultEntry.error;
 
-        col.innerHTML = `
-            <div class="col-header">
-                <div class="col-model-info">
-                    <div class="col-icon">${m.icon}</div>
-                    <div><div class="col-name">${m.name}</div><div class="col-provider">${m.org}</div></div>
+        // Error state: show error prominently, hide analysis
+        if (hasError) {
+            col.innerHTML = `
+                <div class="col-header">
+                    <div class="col-model-info">
+                        <div class="col-icon">${m.icon}</div>
+                        <div><div class="col-name">${m.name}</div><div class="col-provider">${m.org}</div></div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-analysis">
-                <div class="analysis-label">内容 & 风格分析</div>
-                <div class="tags-row">${tags.length ? tags.map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('') : '<span style="font-size:11px;color:#d1d5db;">分析加载中…</span>'}</div>
-                ${statsHtml}
-            </div>
-            ${keyPoint ? `<div class="col-keypoint">
-                <div class="keypoint-label">⚡ 核心摘要</div>
-                <div class="keypoint-text">${keyPoint}</div>
-            </div>` : ''}
-            <div class="col-answer">
-                ${isSingleModel ? '' : `<button class="expand-toggle" id="toggle-${id}" onclick="toggleAnswer('${id}')">
-                    <span class="arrow">↓</span> 展开完整回答
-                </button>`}
-                <div class="full-answer-content ${isSingleModel ? 'open' : ''}" id="answer-${id}">${fmt(fullAnswer)}</div>
-            </div>
-            <div class="col-select">
-                <button class="select-btn" id="selbtn-${id}" onclick="chooseModel('${id}')">选择这个回答</button>
-            </div>`;
+                <div style="padding:24px 20px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">⚠️</div>
+                    <div style="font-size:13px;color:#ef4444;font-weight:600;margin-bottom:4px;">请求失败</div>
+                    <div style="font-size:12px;color:#9ca3af;">${resultEntry.error}</div>
+                </div>`;
+        } else {
+            col.innerHTML = `
+                <div class="col-header">
+                    <div class="col-model-info">
+                        <div class="col-icon">${m.icon}</div>
+                        <div><div class="col-name">${m.name}</div><div class="col-provider">${m.org}</div></div>
+                    </div>
+                </div>
+                <div class="col-analysis">
+                    <div class="analysis-label">内容 & 风格分析</div>
+                    <div class="tags-row">${tags.length ? tags.map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('') : ''}</div>
+                    ${statsHtml}
+                </div>
+                ${keyPoint ? `<div class="col-keypoint">
+                    <div class="keypoint-label">⚡ 核心摘要</div>
+                    <div class="keypoint-text">${keyPoint}</div>
+                </div>` : ''}
+                <div class="col-answer">
+                    ${isSingleModel ? '' : `<button class="expand-toggle" id="toggle-${id}" onclick="toggleAnswer('${id}')">
+                        <span class="arrow">↓</span> 展开完整回答
+                    </button>`}
+                    <div class="full-answer-content ${isSingleModel ? 'open' : ''}" id="answer-${id}">${fmt(fullAnswer)}</div>
+                </div>
+                <div class="col-select">
+                    <button class="select-btn" id="selbtn-${id}" onclick="chooseModel('${id}')">选择这个回答</button>
+                </div>`;
+        }
         grid.appendChild(col);
     });
 
