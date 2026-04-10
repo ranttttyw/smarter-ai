@@ -3,316 +3,1179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ModelMix · AI 模型对比</title>
+    <title>Starry · AI 星球漫游</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ═══════════════════════════════════════════════════════
+           SPACE BACKGROUND WITH ANIMATED STARS
+        ═══════════════════════════════════════════════════════ */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
-            background: #f5f6fa; color: #1a1a2e; min-height: 100vh;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a0f3d 50%, #0d1b4a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* HEADER */
+        /* Twinkling stars background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, white, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 60% 70%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 50% 50%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 80% 10%, white, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 90% 60%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 30% 80%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 10% 20%, white, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 40% 40%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 70% 90%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 25% 15%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 95% 35%, white, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 45% 65%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 15% 55%, white, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 85% 80%, white, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 55% 25%, white, rgba(255,255,255,0));
+            background-size: 200% 200%, 250% 250%, 180% 180%, 220% 220%, 240% 240%, 210% 210%, 190% 190%, 230% 230%, 260% 260%, 200% 200%, 240% 240%, 210% 210%, 220% 220%, 250% 250%, 200% 200%;
+            background-position:
+                0% 0%,
+                10% 15%,
+                20% 25%,
+                30% 35%,
+                40% 45%,
+                50% 55%,
+                60% 65%,
+                70% 75%,
+                80% 85%,
+                90% 95%,
+                5% 20%,
+                25% 40%,
+                45% 60%,
+                65% 75%,
+                85% 10%;
+            animation: startwinkle 8s ease-in-out infinite, startwinkle2 5.5s ease-in-out 1.2s infinite, startwinkle3 6.8s ease-in-out 0.6s infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes startwinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.9; }
+        }
+        @keyframes startwinkle2 {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        @keyframes startwinkle3 {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.8; }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           HEADER
+        ═══════════════════════════════════════════════════════ */
         .header {
-            background: white; border-bottom: 1px solid #e5e7eb;
-            padding: 14px 28px; display: flex; align-items: center;
-            justify-content: space-between; position: sticky; top: 0;
-            z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            background: rgba(10, 14, 39, 0.6);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-        .logo { font-size: 18px; font-weight: 800; color: #6366f1; letter-spacing: -0.5px; }
-        .logo span { color: #1f2937; }
-        .header-right { display: flex; align-items: center; gap: 12px; }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .header-badge {
-            background: #f0f9ff; border: 1px solid #bae6fd; color: #0369a1;
-            font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px;
+            background: rgba(96, 165, 250, 0.15);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            color: #93c5fd;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 100px;
         }
+
         .pref-toggle-btn {
-            background: none; border: 1px solid #e5e7eb; border-radius: 8px;
-            padding: 5px 12px; font-size: 12px; color: #6b7280; cursor: pointer;
-            font-family: inherit; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 12px;
+            color: #cbd5e1;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .pref-toggle-btn:hover { border-color: #6366f1; color: #6366f1; background: #f5f3ff; }
+
+        .pref-toggle-btn:hover {
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.3);
+            color: #93c5fd;
+        }
+
         .pref-dot {
-            width: 7px; height: 7px; border-radius: 50%; background: #6366f1; display: none;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #60a5fa;
+            display: none;
+            box-shadow: 0 0 8px #60a5fa;
         }
-        .pref-dot.has-data { display: inline-block; }
 
-        /* CONTAINER */
-        .container { max-width: 1440px; margin: 0 auto; padding: 28px 24px; }
+        .pref-dot.has-data {
+            display: inline-block;
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
 
-        /* PREFERENCE PANEL */
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 6px #60a5fa; }
+            50% { box-shadow: 0 0 16px #60a5fa; }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           CONTAINER
+        ═══════════════════════════════════════════════════════ */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 28px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           PREFERENCE PANEL
+        ═══════════════════════════════════════════════════════ */
         .pref-panel {
-            display: none; background: white; border-radius: 20px;
-            padding: 22px 24px; margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e0e7ff;
+            display: none;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 22px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
+
         .pref-panel.open { display: block; }
-        .pref-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-        .pref-title { font-size: 14px; font-weight: 700; color: #1f2937; }
-        .pref-subtitle { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+
+        .pref-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .pref-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .pref-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
         .clear-btn {
-            background: none; border: 1px solid #fca5a5; color: #ef4444;
-            border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600;
-            cursor: pointer; font-family: inherit; transition: all 0.15s;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
         }
-        .clear-btn:hover { background: #fef2f2; }
-        .pref-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+
+        .clear-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .pref-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
         .pref-stat-card {
-            background: #f9fafb; border-radius: 12px; padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .psc-label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-        .psc-val { font-size: 22px; font-weight: 800; color: #1f2937; }
-        .psc-sub { font-size: 11px; color: #6b7280; margin-top: 3px; }
+
+        .psc-label {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .psc-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: #f1f5f9;
+        }
+
+        .psc-sub {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 3px;
+        }
 
         .pref-model-bars { margin-bottom: 18px; }
-        .pmb-title { font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 10px; }
-        .pmb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .pmb-name { font-size: 12px; color: #4b5563; font-weight: 600; min-width: 90px; }
-        .pmb-bar-wrap { flex: 1; height: 8px; background: #f3f4f6; border-radius: 100px; overflow: hidden; }
-        .pmb-bar-fill { height: 100%; border-radius: 100px; transition: width 0.5s ease; }
-        .pmb-count { font-size: 11px; color: #9ca3af; min-width: 28px; text-align: right; }
 
-        .pref-history-title { font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 10px; }
-        .pref-history { display: flex; flex-direction: column; gap: 7px; }
+        .pmb-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .pmb-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .pmb-name {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            min-width: 90px;
+        }
+
+        .pmb-bar-wrap {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .pmb-bar-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.5s ease;
+        }
+
+        .pmb-count {
+            font-size: 11px;
+            color: #64748b;
+            min-width: 28px;
+            text-align: right;
+        }
+
+        .pref-history-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .pref-history {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
         .pref-hist-row {
-            display: flex; align-items: center; justify-content: space-between;
-            background: #f9fafb; border-radius: 10px; padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 9px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
-        .phr-q { font-size: 12px; color: #374151; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 12px; }
-        .phr-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .phr-model { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 100px; }
-        .phr-time { font-size: 11px; color: #9ca3af; }
-        .pref-empty { text-align: center; padding: 28px; color: #9ca3af; font-size: 13px; }
 
-        /* QUERY SECTION */
+        .phr-q {
+            font-size: 12px;
+            color: #cbd5e1;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 12px;
+        }
+
+        .phr-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .phr-model {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 100px;
+        }
+
+        .phr-time {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .pref-empty {
+            text-align: center;
+            padding: 28px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           QUERY SECTION (BOTTOM BEACON)
+        ═══════════════════════════════════════════════════════ */
         .query-section {
-            background: white; border-radius: 20px; padding: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 20px;
         }
-        .query-label { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-        .query-input {
-            width: 100%; border: 2px solid #e5e7eb; border-radius: 14px;
-            padding: 14px 18px; font-size: 15px; resize: none; outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit; line-height: 1.6; color: #1f2937;
-        }
-        .query-input:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,0.08); }
-        .query-input::placeholder { color: #d1d5db; }
 
-        .presets-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .preset-label { font-size: 11px; color: #d1d5db; font-weight: 500; white-space: nowrap; }
-        .preset-btn {
-            background: #f9fafb; border: 1px solid #e5e7eb; padding: 5px 12px;
-            border-radius: 8px; font-size: 12px; color: #6b7280; cursor: pointer;
-            transition: all 0.15s; font-family: inherit; white-space: nowrap;
+        .query-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
         }
-        .preset-btn:hover { background: #f0f0ff; border-color: #c4b5fd; color: #6366f1; }
+
+        .query-input {
+            width: 100%;
+            border: 2px solid rgba(96, 165, 250, 0.25);
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            line-height: 1.6;
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .query-input:focus {
+            border-color: #60a5fa;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 24px rgba(96, 165, 250, 0.3), inset 0 0 0 1px rgba(96, 165, 250, 0.1);
+        }
+
+        .query-input::placeholder {
+            color: #64748b;
+        }
+
+        .presets-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .preset-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .preset-btn:hover {
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.3);
+            color: #93c5fd;
+        }
 
         .model-selector-row {
-            display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: wrap; gap: 12px; margin-top: 18px; padding-top: 18px; border-top: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .chips-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .chips-label { font-size: 12px; color: #9ca3af; font-weight: 500; }
-        .model-chip {
-            display: flex; align-items: center; gap: 7px; padding: 7px 14px;
-            border: 2px solid #e5e7eb; border-radius: 100px; cursor: pointer;
-            transition: all 0.18s; font-size: 13px; font-weight: 600; color: #6b7280;
-            background: white; user-select: none;
-        }
-        .model-chip:hover:not(.disabled) { border-color: #c4b5fd; background: #f5f3ff; color: #6366f1; }
-        .model-chip.selected { border-color: var(--c); background: var(--bg); color: var(--c); }
-        .model-chip.disabled { opacity: 0.4; cursor: not-allowed; }
-        .chip-dot { width: 7px; height: 7px; border-radius: 50%; background: #e5e7eb; transition: background 0.18s; }
-        .model-chip.selected .chip-dot { background: var(--c); }
-        .action-group { display: flex; align-items: center; gap: 12px; }
-        .count-badge { font-size: 12px; color: #9ca3af; }
-        .compare-btn {
-            background: #6366f1; color: white; border: none; padding: 10px 22px;
-            border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer;
-            transition: all 0.2s; font-family: inherit; display: flex; align-items: center; gap: 7px;
-        }
-        .compare-btn:hover:not(:disabled) { background: #4f46e5; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99,102,241,0.35); }
-        .compare-btn:disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
 
-        /* LOADING */
+        .chips-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chips-label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .model-chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.18s;
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.03);
+            user-select: none;
+        }
+
+        .model-chip:hover:not(.disabled) {
+            border-color: rgba(96, 165, 250, 0.5);
+            background: rgba(96, 165, 250, 0.12);
+            color: #93c5fd;
+        }
+
+        .model-chip.selected {
+            border-color: var(--c);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .model-chip.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .chip-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.18s;
+        }
+
+        .model-chip.selected .chip-dot {
+            background: var(--c);
+            box-shadow: 0 0 12px var(--c);
+        }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .count-badge {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .compare-btn {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 4px 20px rgba(96, 165, 250, 0.3);
+        }
+
+        .compare-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(96, 165, 250, 0.4);
+        }
+
+        .compare-btn:disabled {
+            background: rgba(255, 255, 255, 0.08);
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           LOADING
+        ═══════════════════════════════════════════════════════ */
         .loading-section { display: none; }
-        .loading-header { text-align: center; padding: 20px 0 16px; color: #9ca3af; font-size: 13px; }
+
+        .loading-header {
+            text-align: center;
+            padding: 20px 0 16px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
         .loading-spinner {
-            display: inline-block; width: 16px; height: 16px; border: 2px solid #e5e7eb;
-            border-top-color: #6366f1; border-radius: 50%; animation: spin 0.7s linear infinite;
-            margin-right: 8px; vertical-align: middle;
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(96, 165, 250, 0.3);
+            border-top-color: #60a5fa;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
         }
+
         @keyframes spin { to { transform: rotate(360deg); } }
+
         .loading-grid { display: grid; gap: 16px; }
-        .loading-card { background: white; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 10px; }
-        .skeleton {
-            background: linear-gradient(90deg, #f3f4f6 25%, #ebebeb 50%, #f3f4f6 75%);
-            background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 6px;
+
+        .loading-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(96, 165, 250, 0.1) 25%, rgba(96, 165, 250, 0.2) 50%, rgba(96, 165, 250, 0.1) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 6px;
+        }
+
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        /* RESULTS */
+        /* ═══════════════════════════════════════════════════════
+           RESULTS
+        ═══════════════════════════════════════════════════════ */
         .results-section { display: none; }
+
         .summary-card {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            border-radius: 18px; padding: 20px 24px; color: white;
-            margin-bottom: 16px; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(167, 139, 250, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 18px;
+            padding: 20px 24px;
+            color: #e2e8f0;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            box-shadow: 0 8px 32px rgba(96, 165, 250, 0.15);
         }
+
         .summary-card::before {
-            content: ''; position: absolute; top: -40px; right: -40px;
-            width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(96, 165, 250, 0.2), transparent);
         }
-        .summary-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; opacity: 0.65; text-transform: uppercase; margin-bottom: 8px; }
-        .summary-text { font-size: 14px; line-height: 1.65; font-weight: 500; }
-        .summary-chips { display: flex; gap: 7px; margin-top: 14px; flex-wrap: wrap; }
-        .summary-chip { background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.28); border-radius: 100px; padding: 4px 12px; font-size: 11px; font-weight: 600; }
+
+        .summary-eyebrow {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            opacity: 0.65;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .summary-text {
+            font-size: 14px;
+            line-height: 1.65;
+            font-weight: 500;
+        }
+
+        .summary-chips {
+            display: flex;
+            gap: 7px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .summary-chip {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 100px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
 
         .models-grid { display: grid; gap: 14px; }
+
         .model-col {
-            background: white; border-radius: 18px; border: 2px solid transparent;
-            transition: border-color 0.25s, box-shadow 0.25s; overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
-        .model-col.is-selected { border-color: var(--c); box-shadow: 0 0 0 4px var(--shadow), 0 4px 16px rgba(0,0,0,0.08); }
 
-        .col-header { padding: 16px 20px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f9fafb; }
-        .col-model-info { display: flex; align-items: center; gap: 11px; }
-        .col-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; color: white; background: var(--c); flex-shrink: 0; }
-        .col-name { font-size: 15px; font-weight: 700; color: #111827; }
-        .col-provider { font-size: 11px; color: #9ca3af; margin-top: 1px; }
+        .model-col.is-selected {
+            border-color: var(--c);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 32px var(--glow), 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
 
-        .col-analysis { padding: 14px 20px 12px; border-bottom: 1px solid #f9fafb; }
-        .analysis-label { font-size: 10px; font-weight: 700; color: #d1d5db; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-        .tags-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
-        .tag { padding: 3px 9px; border-radius: 100px; font-size: 10px; font-weight: 700; }
-        .t-blue { background: #dbeafe; color: #1d4ed8; }
-        .t-green { background: #dcfce7; color: #15803d; }
-        .t-orange { background: #ffedd5; color: #c2410c; }
-        .t-purple { background: #f3e8ff; color: #7c3aed; }
-        .t-gray { background: #f3f4f6; color: #4b5563; }
-        .t-yellow { background: #fef9c3; color: #92400e; }
-        .t-red { background: #fee2e2; color: #b91c1c; }
+        .col-header {
+            padding: 16px 20px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-        .stat-item { display: flex; flex-direction: column; gap: 4px; }
-        .stat-name { font-size: 10px; color: #9ca3af; font-weight: 500; }
-        .stat-bar-row { display: flex; align-items: center; gap: 6px; }
-        .stat-bar { flex: 1; height: 4px; background: #f3f4f6; border-radius: 100px; overflow: hidden; }
-        .stat-fill { height: 100%; border-radius: 100px; transition: width 0.7s cubic-bezier(0.4,0,0.2,1); }
-        .stat-val { font-size: 10px; color: #9ca3af; min-width: 24px; text-align: right; }
+        .col-model-info {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
 
-        .col-keypoint { padding: 13px 20px; background: #fafafa; border-bottom: 1px solid #f3f4f6; }
-        .keypoint-label { font-size: 10px; font-weight: 700; color: #d1d5db; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-        .keypoint-text { font-size: 12.5px; color: #374151; line-height: 1.55; }
+        .col-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            color: white;
+            background: var(--c);
+            flex-shrink: 0;
+            box-shadow: 0 0 16px var(--glow);
+        }
 
-        .col-answer { border-bottom: 1px solid #f3f4f6; }
+        .col-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .col-provider {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 1px;
+        }
+
+        .col-analysis {
+            padding: 14px 20px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .analysis-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+
+        .tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            padding: 3px 9px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .t-blue { background: rgba(96, 165, 250, 0.2); color: #93c5fd; }
+        .t-green { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+        .t-orange { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+        .t-purple { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+        .t-gray { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; }
+        .t-yellow { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+        .t-red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-name {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .stat-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-val {
+            font-size: 10px;
+            color: #64748b;
+            min-width: 24px;
+            text-align: right;
+        }
+
+        .col-keypoint {
+            padding: 13px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .keypoint-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .keypoint-text {
+            font-size: 12.5px;
+            color: #cbd5e1;
+            line-height: 1.55;
+        }
+
+        .col-answer { border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+
         .expand-toggle {
-            width: 100%; background: none; border: none; padding: 11px 20px;
-            font-size: 12px; color: #9ca3af; cursor: pointer; display: flex;
-            align-items: center; gap: 6px; font-family: inherit; font-weight: 500; transition: color 0.15s;
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 11px 20px;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            font-weight: 500;
+            transition: color 0.15s;
         }
-        .expand-toggle:hover { color: #6366f1; }
-        .expand-toggle .arrow { transition: transform 0.2s; display: inline-block; }
+
+        .expand-toggle:hover { color: #93c5fd; }
+
+        .expand-toggle .arrow {
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
         .expand-toggle.open .arrow { transform: rotate(180deg); }
-        .full-answer-content { display: none; padding: 2px 20px 16px; font-size: 12.5px; color: #374151; line-height: 1.75; border-top: 1px solid #f3f4f6; }
+
+        .full-answer-content {
+            display: none;
+            padding: 2px 20px 16px;
+            font-size: 12.5px;
+            color: #cbd5e1;
+            line-height: 1.75;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
         .full-answer-content.open { display: block; }
-        .full-answer-content code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-size: 11.5px; font-family: 'SF Mono', 'Fira Code', monospace; }
-        .full-answer-content pre { background: #1f2937; color: #e5e7eb; border-radius: 10px; padding: 12px 16px; font-size: 12px; overflow-x: auto; margin: 10px 0; font-family: 'SF Mono', 'Fira Code', monospace; line-height: 1.6; }
-        .full-answer-content strong { color: #111827; }
+
+        .full-answer-content code {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 11.5px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            color: #93c5fd;
+        }
+
+        .full-answer-content pre {
+            background: rgba(0, 0, 0, 0.4);
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            line-height: 1.6;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .full-answer-content strong { color: #f1f5f9; }
 
         .col-select { padding: 14px 20px; }
+
         .select-btn {
-            width: 100%; padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 700;
-            cursor: pointer; transition: all 0.2s; border: 2px solid var(--c);
-            background: white; color: var(--c); font-family: inherit; letter-spacing: 0.01em;
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid var(--c);
+            background: transparent;
+            color: var(--c);
+            font-family: inherit;
+            letter-spacing: 0.01em;
         }
-        .select-btn:hover { background: var(--bg); transform: translateY(-1px); }
-        .model-col.is-selected .select-btn { background: var(--c); color: white; }
 
-        /* POST BAR */
+        .select-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px var(--glow);
+            transform: translateY(-1px);
+        }
+
+        .model-col.is-selected .select-btn {
+            background: var(--c);
+            color: white;
+            box-shadow: 0 0 24px var(--glow);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           POST BAR
+        ═══════════════════════════════════════════════════════ */
         .post-bar {
-            display: none; background: white; border-radius: 18px; padding: 18px 24px;
-            margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            align-items: center; justify-content: space-between; gap: 16px;
-            flex-wrap: wrap; border: 2px solid #e0e7ff;
+            display: none;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 18px;
+            padding: 18px 24px;
+            margin-top: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
+
         .post-bar.show { display: flex; }
-        .post-bar-text { font-size: 14px; color: #4b5563; }
-        .post-bar-text strong { color: #1f2937; }
-        .post-actions { display: flex; gap: 10px; flex-shrink: 0; }
-        .post-btn { padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s; font-family: inherit; border: none; }
-        .post-btn-ghost { background: #f3f4f6; color: #4b5563; }
-        .post-btn-ghost:hover { background: #e5e7eb; }
-        .post-btn-primary { background: #6366f1; color: white; }
-        .post-btn-primary:hover { background: #4f46e5; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
 
-        /* TOAST */
+        .post-bar-text {
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        .post-bar-text strong { color: #f1f5f9; }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .post-btn {
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: inherit;
+            border: none;
+        }
+
+        .post-btn-ghost {
+            background: rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+        }
+
+        .post-btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #f1f5f9;
+        }
+
+        .post-btn-primary {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+        }
+
+        .post-btn-primary:hover {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 6px 24px rgba(96, 165, 250, 0.4);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           TOAST
+        ═══════════════════════════════════════════════════════ */
         .toast {
-            position: fixed; bottom: 28px; left: 50%;
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: #1f2937; color: white; padding: 12px 22px;
-            border-radius: 12px; font-size: 13px; font-weight: 500;
-            opacity: 0; transition: all 0.3s; z-index: 200; white-space: nowrap;
+            background: rgba(15, 23, 42, 0.9);
+            color: #f1f5f9;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 200;
+            white-space: nowrap;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* DEEP CHAT */
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           DEEP CHAT
+        ═══════════════════════════════════════════════════════ */
         .chat-section {
-            display: none; margin-top: 16px; background: white; border-radius: 20px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
-            border: 2px solid #e0e7ff; max-width: 720px; margin-left: auto; margin-right: auto;
+            display: none;
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
         }
+
         .chat-section.show { display: block; }
+
         .chat-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 20px; border-bottom: 1px solid #f3f4f6; background: #fafafe;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.02);
         }
-        .chat-header-left { display: flex; align-items: center; gap: 12px; }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .chat-model-icon {
-            width: 36px; height: 36px; border-radius: 10px; display: flex;
-            align-items: center; justify-content: center; color: white;
-            font-weight: 800; font-size: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 0 16px rgba(96, 165, 250, 0.3);
         }
-        .chat-model-name { font-weight: 700; font-size: 14px; color: #1f2937; }
-        .chat-model-org { font-size: 11px; color: #9ca3af; }
+
+        .chat-model-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: #f1f5f9;
+        }
+
+        .chat-model-org {
+            font-size: 11px;
+            color: #64748b;
+        }
+
         .chat-back-btn {
-            background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 10px;
-            font-size: 12px; color: #6b7280; cursor: pointer; font-weight: 600;
-            font-family: inherit; transition: all 0.15s;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #cbd5e1;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.15s;
         }
-        .chat-back-btn:hover { background: #e5e7eb; }
+
+        .chat-back-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #f1f5f9;
+        }
+
         .chat-messages {
-            padding: 20px; min-height: 200px; max-height: 500px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 16px;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
+
         .chat-bubble {
-            max-width: 85%; padding: 12px 16px; border-radius: 16px;
-            font-size: 13.5px; line-height: 1.7; word-break: break-word;
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 13.5px;
+            line-height: 1.7;
+            word-break: break-word;
         }
+
         .chat-bubble.user {
-            align-self: flex-end; background: #6366f1; color: white; border-bottom-right-radius: 4px;
+            align-self: flex-end;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.4) 0%, rgba(96, 165, 250, 0.3) 100%);
+            color: #f1f5f9;
+            border-bottom-right-radius: 4px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
         }
+
         .chat-bubble.assistant {
-            align-self: flex-start; background: #f3f4f6; color: #1f2937; border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .chat-bubble.assistant strong { color: #111827; }
+
+        .chat-bubble.assistant strong { color: #f1f5f9; }
+
         .chat-input-row {
-            display: flex; gap: 10px; padding: 16px 20px; border-top: 1px solid #f3f4f6;
-            background: #fafafe;
+            display: flex;
+            gap: 10px;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.02);
         }
+
         .chat-input {
-            flex: 1; border: 2px solid #e5e7eb; border-radius: 12px; padding: 10px 14px;
-            font-size: 13px; font-family: inherit; resize: none; outline: none;
-            transition: border-color 0.15s;
+            flex: 1;
+            border: 2px solid rgba(96, 165, 250, 0.25);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: all 0.15s;
+            background: rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
         }
-        .chat-input:focus { border-color: #6366f1; }
+
+        .chat-input:focus {
+            border-color: #60a5fa;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 16px rgba(96, 165, 250, 0.2);
+        }
+
+        .chat-input::placeholder { color: #64748b; }
+
         .chat-send-btn {
-            padding: 10px 20px; background: #6366f1; color: white; border: none;
-            border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
-            font-family: inherit; transition: all 0.15s; align-self: flex-end;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+            align-self: flex-end;
+            box-shadow: 0 4px 12px rgba(96, 165, 250, 0.25);
         }
-        .chat-send-btn:hover { background: #4f46e5; }
-        .chat-send-btn:disabled { background: #d1d5db; cursor: not-allowed; }
-        .chat-typing { color: #9ca3af; font-size: 12px; font-style: italic; }
+
+        .chat-send-btn:hover {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 6px 20px rgba(96, 165, 250, 0.35);
+        }
+
+        .chat-send-btn:disabled {
+            background: rgba(255, 255, 255, 0.08);
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .chat-typing {
+            color: #64748b;
+            font-size: 12px;
+            font-style: italic;
+        }
 
         @media (max-width: 900px) {
             .models-grid { grid-template-columns: 1fr !important; }
@@ -324,12 +1187,12 @@
 <body>
 
 <header class="header">
-    <div class="logo">Model<span>Mix</span></div>
+    <div class="logo">✨ Starry</div>
     <div class="header-right">
         <button class="pref-toggle-btn" onclick="togglePrefPanel()" id="prefToggleBtn">
-            <span class="pref-dot" id="prefDot"></span>📊 我的偏好记录
+            <span class="pref-dot" id="prefDot"></span>📊 星球日志
         </button>
-        <div class="header-badge">写作对比</div>
+        <div class="header-badge">寻找AI知己</div>
     </div>
 </header>
 
@@ -339,33 +1202,33 @@
     <div class="pref-panel" id="prefPanel">
         <div class="pref-header">
             <div>
-                <div class="pref-title">📊 我的偏好记录</div>
-                <div class="pref-subtitle">基于你每次选择自动积累，帮你了解自己的 AI 使用习惯</div>
+                <div class="pref-title">📊 星球日志</div>
+                <div class="pref-subtitle">记录你在宇宙中的选择足迹</div>
             </div>
-            <button class="clear-btn" onclick="clearPrefs()">清空记录</button>
+            <button class="clear-btn" onclick="clearPrefs()">清空日志</button>
         </div>
         <div id="prefContent"></div>
     </div>
 
     <!-- 提问区 -->
     <div class="query-section">
-        <div class="query-label">你的问题</div>
+        <div class="query-label">向宇宙发送信号</div>
         <textarea class="query-input" id="queryInput" rows="3"
-            placeholder="描述你的写作需求，比如：帮我写一篇小红书种草文案，介绍一款抹茶拿铁..."></textarea>
+            placeholder="向宇宙发送你的信号…"></textarea>
         <div class="presets-row">
-            <span class="preset-label">试试：</span>
-            <button class="preset-btn" onclick="setPreset(0)">小红书：一个人去京都旅行</button>
-            <button class="preset-btn" onclick="setPreset(1)">拒绝 offer 的邮件</button>
-            <button class="preset-btn" onclick="setPreset(2)">AI 工具产品介绍</button>
+            <span class="preset-label">快捷星球：</span>
+            <button class="preset-btn" onclick="setPreset(0)">🗺️ 小红书：一个人去京都旅行</button>
+            <button class="preset-btn" onclick="setPreset(1)">📧 拒绝 offer 的邮件</button>
+            <button class="preset-btn" onclick="setPreset(2)">🤖 AI 工具产品介绍</button>
         </div>
         <div class="model-selector-row">
             <div class="chips-group">
-                <span class="chips-label">选择模型（最多 3 个）</span>
+                <span class="chips-label">选择星球（最多 3 个）</span>
                 <div id="chipsContainer" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
             </div>
             <div class="action-group">
-                <span class="count-badge" id="countBadge">请选择模型</span>
-                <button class="compare-btn" id="compareBtn" onclick="startCompare()" disabled>⚡ 开始对比</button>
+                <span class="count-badge" id="countBadge">请选择星球</span>
+                <button class="compare-btn" id="compareBtn" onclick="startCompare()" disabled>🚀 启动探索</button>
             </div>
         </div>
     </div>
@@ -373,7 +1236,7 @@
     <!-- Loading -->
     <div class="loading-section" id="loadingSection">
         <div class="loading-header">
-            <span class="loading-spinner"></span>正在向 <span id="loadingCount">0</span> 个模型并发查询...
+            <span class="loading-spinner"></span>正在向 <span id="loadingCount">0</span> 个星球发送信号…
         </div>
         <div class="loading-grid" id="loadingGrid"></div>
     </div>
@@ -385,8 +1248,8 @@
         <div class="post-bar" id="postBar">
             <div class="post-bar-text" id="postBarText"></div>
             <div class="post-actions">
-                <button class="post-btn post-btn-ghost" onclick="continueAll()">🔄 继续同时提问这些模型</button>
-                <button class="post-btn post-btn-primary" id="deepDiveBtn" onclick="deepDive()">进入选中模型深聊 →</button>
+                <button class="post-btn post-btn-ghost" onclick="continueAll()">🔄 继续探索其他星球</button>
+                <button class="post-btn post-btn-primary" id="deepDiveBtn" onclick="deepDive()">深入星球对话 →</button>
             </div>
         </div>
     </div>
@@ -401,11 +1264,11 @@
                     <div class="chat-model-org" id="chatModelOrg"></div>
                 </div>
             </div>
-            <button class="chat-back-btn" onclick="exitChat()">← 返回对比</button>
+            <button class="chat-back-btn" onclick="exitChat()">← 返回探索</button>
         </div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input-row">
-            <textarea class="chat-input" id="chatInput" rows="2" placeholder="继续聊…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+            <textarea class="chat-input" id="chatInput" rows="2" placeholder="继续对话…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
             <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">发送</button>
         </div>
     </div>
@@ -415,12 +1278,12 @@
 
 <script>
 // ══════════════════════════════════════════════════════
-//  模型配置
+//  MODEL CONFIG
 // ══════════════════════════════════════════════════════
 const MODELS = [
-    { id: 'gemini',   name: 'Gemini Flash', org: 'Google',   c: '#4285f4', bg: '#eff6ff', shadow: 'rgba(66,133,244,0.12)',  icon: 'G' },
-    { id: 'deepseek', name: 'DeepSeek V3',  org: 'DeepSeek', c: '#7c3aed', bg: '#f5f3ff', shadow: 'rgba(124,58,237,0.12)', icon: 'D' },
-    { id: 'glm',      name: 'GLM-4.7',      org: '智谱 AI',  c: '#0d9488', bg: '#f0fdfa', shadow: 'rgba(13,148,136,0.12)',  icon: 'Z' },
+    { id: 'gemini',   name: 'Gemini Flash', org: 'Google',   c: '#4285f4', bg: '#eff6ff', shadow: 'rgba(66,133,244,0.12)',  icon: 'G', glow: 'rgba(66,133,244,0.6)' },
+    { id: 'deepseek', name: 'DeepSeek V3',  org: 'DeepSeek', c: '#7c3aed', bg: '#f5f3ff', shadow: 'rgba(124,58,237,0.12)', icon: 'D', glow: 'rgba(124,58,237,0.6)' },
+    { id: 'glm',      name: 'GLM-4.7',      org: '智谱 AI',  c: '#0d9488', bg: '#f0fdfa', shadow: 'rgba(13,148,136,0.12)',  icon: 'Z', glow: 'rgba(13,148,136,0.6)' },
 ];
 
 const PRESETS = [
@@ -437,136 +1300,17 @@ function tagClass(type) {
     return map[type] || 't-gray';
 }
 
-const REMOVED_MOCK = {
-
-"中国 AI PM 的工作是什么？": {
-    summary: "三个模型对「中国 AI PM」的描述侧重点明显不同。GPT-4o 给出了最完整的职责框架，包含从需求到落地的全流程；Claude 着重点出了中国市场特有的挑战（合规、数据主权、模型国产化压力）；Gemini 最直接，给出了招聘 JD 里高频出现的硬技能清单。关键分歧：是否需要技术背景——GPT-4o 和 Gemini 认为要懂大模型，Claude 认为业务判断力比技术更关键。",
-    chips: ["GPT-4o 最全面", "Claude 点出中国特色", "Gemini 最贴近 JD 要求"],
-    models: {
-        gpt4o: {
-            tags: [{t:"详细",c:"t-blue"},{t:"职责框架",c:"t-green"},{t:"正式",c:"t-purple"},{t:"分层结构",c:"t-gray"}],
-            stats: { "回答长度": 88, "信息密度": 82, "正式程度": 85, "结构化": 92 },
-            keyPoint: "将 AI PM 工作拆成「产品策略→数据&模型→工程协作→商业落地」四层框架，强调需要懂大模型能力边界，能做 Prompt Engineering，并与算法团队共同定义评估指标",
-            fullAnswer: `**中国 AI PM 的核心职责（全栈视角）**\n\n**1. 产品策略层**\n- 识别 AI 能真正解决的用户问题（而非「为了 AI 而 AI」）\n- 竞品分析：字节 / 阿里 / 百度 / 腾讯 AI 产品的差异化定位\n- 制定 AI 能力路线图，与业务目标对齐\n\n**2. 数据与模型层**\n- 定义训练数据需求和标注规范\n- 理解模型能力边界（幻觉问题、上下文窗口、推理成本）\n- 参与 Prompt 工程和模型评估指标设计（BLEU / 人工评估 / A/B测试）\n- 在国内合规框架下选择模型：自研 vs. 调用文心/通义/混元 API\n\n**3. 跨团队协作层**\n- 与算法工程师对齐技术可行性\n- 与数据团队协调数据采集、清洗、标注\n- 向业务方翻译「AI 能做什么、不能做什么」\n\n**4. 商业落地层**\n- 定义 AI 功能的 GMV / 效率提升 / 用户留存等业务指标\n- 管理 AI 功能的推理成本与商业价值之间的 trade-off\n- 合规审查：《生成式 AI 服务管理暂行办法》要求\n\n**与传统 PM 最大的不同：**\n需要具备「不确定性管理」能力——AI 功能不像传统功能，效果是概率性的，需要在迭代中持续校准预期。`,
-        },
-        claude: {
-            tags: [{t:"中国视角",c:"t-orange"},{t:"挑战导向",c:"t-red"},{t:"温和语气",c:"t-blue"},{t:"适中",c:"t-green"}],
-            stats: { "回答长度": 65, "信息密度": 72, "正式程度": 58, "结构化": 65 },
-            keyPoint: "唯一重点分析了中国 AI PM 区别于硅谷 AI PM 的特殊挑战：国产大模型选型压力、合规红线（算法备案/生成内容标识）、数据本地化要求，以及如何在内卷市场中找到差异化",
-            fullAnswer: `做中国 AI PM，和做「AI PM」本身有很多共同之处，但也有一些很中国特色的挑战，我觉得这些才是真正有意思的部分。\n\n**通用部分：**\n- 把用户痛点翻译成模型可以解决的问题\n- 管理 AI 产品天然的不确定性（效果不是 100% 可控的）\n- 在「酷炫的技术」和「真正有用的功能」之间做判断\n\n**中国特有的挑战：**\n\n**模型选型压力**：要在文心一言、通义千问、混元、Kimi、DeepSeek 之间做选择，还要考虑政策导向——很多国企客户有「国产优先」的要求，不能直接用 OpenAI。\n\n**合规红线**：《生成式 AI 服务管理暂行办法》要求对生成内容进行标识、对算法进行备案、对有舆论属性的产品进行安全评估。这些会直接影响产品设计。\n\n**数据本地化**：用户数据不能出境，这在设计 AI 功能时会影响模型选择和数据架构。\n\n**卷的环境**：国内 AI 产品迭代速度极快，今天发布的功能可能三个月后就被竞品复刻。所以 AI PM 更需要判断「什么是真正的护城河」。\n\n我觉得比技术背景更关键的，是对「AI 能解决什么问题、在什么场景下划算」有清醒的判断。`,
-        },
-        gemini: {
-            tags: [{t:"JD视角",c:"t-green"},{t:"技能清单",c:"t-blue"},{t:"简洁",c:"t-gray"},{t:"求职导向",c:"t-orange"}],
-            stats: { "回答长度": 45, "信息密度": 78, "正式程度": 40, "结构化": 72 },
-            keyPoint: "直接给出了国内 AI PM 招聘 JD 里最常出现的硬技能 + 软技能清单，并点明了字节/阿里/百度/腾讯等大厂 AI PM 岗位的差异侧重，最适合备战求职",
-            fullAnswer: `中国 AI PM 的日常工作，结合主流大厂 JD 来说：\n\n**硬技能（简历必备）：**\n- 熟悉主流大模型能力（GPT-4 / Claude / 文心 / 通义 / DeepSeek）\n- 能写 Prompt，理解 RAG、Fine-tuning、Agent 等基本概念\n- 数据分析能力：SQL / Python 基础，会看模型评估报告\n- 了解《生成式 AI 暂行办法》等合规要求\n\n**软技能（面试考察点）：**\n- 需求拆解：把模糊的业务目标转化成模型可执行的任务\n- 跨团队推动：在算法 / 工程 / 业务之间做翻译和协调\n- 不确定性管理：AI 功能效果是概率性的，要能管理各方预期\n\n**各大厂侧重不同：**\n- 字节：增长导向，注重 A/B 测试和数据驱动\n- 阿里：toB 场景多，强调行业解决方案和商业化\n- 百度：搜索+文心生态，强调内容和对话产品\n- 腾讯：C 端社交场景，强调用户体验和安全合规\n\n**核心结论：** AI PM ≠ 会用 ChatGPT 的 PM，需要真正理解模型能力边界，能和算法团队深度协作。`,
-        },
-        deepseek: {
-            tags: [{t:"系统化",c:"t-purple"},{t:"能力模型",c:"t-blue"},{t:"学术视角",c:"t-gray"},{t:"详细",c:"t-green"}],
-            stats: { "回答长度": 78, "信息密度": 85, "正式程度": 80, "结构化": 88 },
-            keyPoint: "从「T型能力模型」出发，将 AI PM 技能分为横向通用层（产品/业务）和纵向专业层（AI 技术栈），并给出了不同发展阶段（0-1年/1-3年/3年+）的能力侧重",
-            fullAnswer: `**中国 AI PM 岗位分析（能力模型视角）**\n\n**T 型能力结构**\n\n横向（通用 PM 能力）：\n- 用户调研与需求分析\n- 产品设计与交互逻辑\n- 数据分析与指标体系\n- 项目管理与跨团队协作\n\n纵向（AI 专业能力）：\n- LLM 基础：Transformer 架构基本原理、Token、上下文窗口\n- 应用层：Prompt Engineering、RAG 检索增强、Agent 设计\n- 评估体系：构建自动化评估 + 人工评估的混合方案\n- 国内合规：算法备案、内容安全、数据本地化\n\n**不同阶段的工作重心**\n\n0-1年（初级）：执行具体功能的需求整理、竞品分析、数据看板搭建\n\n1-3年（中级）：主导 AI 功能从 0-1 落地，管理模型迭代节奏，定义评估指标\n\n3年+（高级）：制定 AI 产品战略，推动组织建立 AI 能力，跨 BU 协调资源\n\n**薪资参考（2024年）**\n初级 AI PM：20-35K/月；中级：35-60K/月；高级：60K+，一线大厂另有期权。`,
-        },
-        llama: {
-            tags: [{t:"入门友好",c:"t-yellow"},{t:"一天流水账",c:"t-orange"},{t:"口语化",c:"t-green"},{t:"具体",c:"t-blue"}],
-            stats: { "回答长度": 52, "信息密度": 60, "正式程度": 38, "结构化": 60 },
-            keyPoint: "用「AI PM 的一天」的叙事方式，把抽象的职责变成具体的场景，帮助没有行业经验的人直观理解这份工作的日常节奏",
-            fullAnswer: `给你描述一个 AI PM 的典型一天，比 JD 更有感觉：\n\n**上午**\n9:00 看数据：昨天新上的 AI 总结功能，用户采用率 12%，低于预期。\n10:00 和算法同学对齐：发现是 Prompt 导致回答太长，用户不读。决定改 Prompt 策略，明天灰度测试。\n11:00 写 PRD：下一个功能——用户提问自动分类。需要定义分类体系，协调数据团队打标签。\n\n**下午**\n14:00 跨部门会：法务说新功能要做内容安全过滤，和算法讨论怎么在不影响体验的前提下加规则。\n16:00 竞品研究：Kimi 刚更新了长文档分析，记录差异，更新竞品分析文档。\n17:30 用户访谈：和 3 个重度用户聊，发现他们最想要的功能其实不是 AI 写作，而是 AI 帮他们「整理已有的内容」。\n\n**一句话总结：** AI PM 本质是翻译官——把用户需求翻译给算法，把模型能力翻译给用户和业务，在两端之间找到最大公约数。`,
-        }
-    }
-},
-
-"如何提高工作效率？": {
-    summary: "三个模型均认可时间管理的核心重要性，但侧重点明显不同：GPT-4o 给出了最系统的方法论框架，Claude 更关注心理层面和可持续性，Gemini 最简洁直接且提出了反直觉的「少即是多」观点。",
-    chips: ["GPT-4o 最结构化", "Claude 最有温度", "Gemini 最简洁+反直觉"],
-    models: {
-        gpt4o: {
-            tags: [{t:"详细",c:"t-blue"},{t:"列表结构",c:"t-green"},{t:"正式语气",c:"t-purple"},{t:"工具推荐",c:"t-gray"}],
-            stats: { "回答长度": 85, "信息密度": 78, "正式程度": 88, "结构化": 95 },
-            keyPoint: "给出「四象限优先级矩阵」完整框架 + 7 个可执行习惯，附有工具推荐（Notion / Todoist / Forest），适合需要系统方法论的人",
-            fullAnswer: `**提升工作效率：系统性方法论**\n\n**1. 优先级管理——四象限法则**\n将所有任务分为：\n- 🔴 紧急且重要（立刻做）\n- 🟡 重要不紧急（计划做，这里最关键）\n- 🟠 紧急不重要（委托他人）\n- ⚪ 不紧急不重要（删除）\n\n**2. 时间分块（Time Blocking）**\n将一天分为深度工作时段（2-4小时）和浅层工作时段（邮件、会议）。将最重要任务安排在精力最旺盛的时段。\n\n**3. 番茄工作法**\n25分钟专注 → 5分钟休息，每4个番茄钟后休息 15-30 分钟。\n\n**4. 推荐工具**\n- Notion / Obsidian：知识管理\n- Todoist / Things 3：任务清单\n- Forest / Focus Flow：专注计时\n\n**5. 每周回顾**\n每周花 30 分钟复盘：完成了什么、卡在哪里、下周如何调整。`,
-        },
-        claude: {
-            tags: [{t:"适中",c:"t-green"},{t:"段落混合",c:"t-blue"},{t:"温和语气",c:"t-orange"},{t:"心理视角",c:"t-yellow"}],
-            stats: { "回答长度": 62, "信息密度": 65, "正式程度": 52, "结构化": 63 },
-            keyPoint: "从「人的状态」出发，指出效率的根本是精力管理而非时间管理，揭示了「虚假忙碌陷阱」",
-            fullAnswer: `工作效率这个问题，很多人关注点可能搞反了——大家总是在问「怎么做更多」，但真正的问题往往是「怎么做对的事」。\n\n**从精力管理开始**\n\n同样是工作 8 小时，有些天结束后感觉充实有成就感，有些天只是疲惫？区别往往在于你是否在状态好的时候做了重要的事。\n\n识别你的「高能时段」——记录一周内你最专注的时间，把最难的任务放在这里。\n\n**关于「虚假忙碌」**\n\n许多知识工作者不停回邮件、开会、处理杂事，感觉一直在忙，但月底发现真正重要的项目几乎没有推进。\n\n建议每天留 2 小时「无打扰深度工作时间」，关掉所有通知，只做一件最重要的事。\n\n**可持续性比短期冲刺更重要**\n\n效率不是高强度冲刺，而是找到可以长期维持的节奏。充足睡眠、适当运动，反而是提升效率的基础。`,
-        },
-        gemini: {
-            tags: [{t:"简洁",c:"t-green"},{t:"要点式",c:"t-blue"},{t:"口语化",c:"t-gray"},{t:"⚠️ 风险提示",c:"t-red"}],
-            stats: { "回答长度": 38, "信息密度": 73, "正式程度": 32, "结构化": 58 },
-            keyPoint: "用「减法思维」给出反直觉建议，明确提醒「过度优化本身就是一种低效」——唯一主动指出潜在陷阱的模型",
-            fullAnswer: `几个直接有效的方法：\n\n🎯 **两分钟法则**（GTD 经典）\n两分钟能搞定的事，现在就做，别放进待办清单。\n\n⚡ **减少，而不是优化**\n很多人的问题不是「做得不够快」，而是「做了太多不该做的事」。先问：这件事真的需要做吗？\n\n🚫 **停止多任务处理**\n研究表明多任务处理会降低 40% 效率。一次只做一件事。\n\n⚠️ **注意陷阱：**\n不要过度优化。花 3 小时设计完美任务管理系统，不如花 20 分钟实际开始做事。很多人的「效率提升」本身就是在逃避真正重要的工作。`,
-        },
-        deepseek: {
-            tags: [{t:"数据引用",c:"t-green"},{t:"学术视角",c:"t-purple"},{t:"正式",c:"t-gray"},{t:"详细",c:"t-blue"}],
-            stats: { "回答长度": 76, "信息密度": 85, "正式程度": 82, "结构化": 84 },
-            keyPoint: "引用斯坦福、哈佛等学术研究为每条建议背书，给出 OKR 量化目标设定方法，信息密度最高",
-            fullAnswer: `**基于认知科学的效率提升策略**\n\n**认知负荷管理**\n斯坦福大学研究表明，人类工作记忆约可处理 4 个信息块。未完成任务会持续占用认知资源（「蔡格尼克效应」）。建议使用 GTD 方法捕获所有开放性任务，释放工作记忆。\n\n**深度工作（Deep Work）**\nCal Newport 研究：知识工作者平均每天只有 1-4 小时真正的深度专注时间。目标是逐步延长这一窗口。\n\n**OKR 目标框架**\n- O（目标）：定性描述方向\n- KR（关键结果）：2-3 个可量化的成功指标\n- 哈佛研究：明确写下目标的人完成率比不写的高 42%\n\n**超日节律**\n每工作 90 分钟休息 20 分钟，整体效率可提升约 30%。`,
-        },
-        llama: {
-            tags: [{t:"零门槛",c:"t-yellow"},{t:"步骤清晰",c:"t-orange"},{t:"行动导向",c:"t-green"},{t:"适中",c:"t-blue"}],
-            stats: { "回答长度": 55, "信息密度": 60, "正式程度": 46, "结构化": 72 },
-            keyPoint: "以「今天就能开始」为核心，给出 5 个零门槛即时执行步骤，没有理论铺垫，最适合想立刻行动的人",
-            fullAnswer: `从今天就能开始的 5 件事：\n\n**第一：每天早上列出 3 件最重要的事**\n不是列所有待办，只选 3 件。完成了就算成功。\n\n**第二：用番茄钟**\n25 分钟专注 → 5 分钟休息。简单好用。\n\n**第三：关掉手机通知**\n调成勿扰模式，每天固定 2-3 个时段统一回复消息。\n\n**第四：学会说「不」**\n不重要的会议、不紧急的请求，礼貌拒绝。你的时间是有限资源。\n\n**第五：每天「收尾仪式」**\n花 10 分钟记录今天完成了什么，明天需要做什么。帮助大脑关机，第二天启动更快。`,
-        }
-    }
-},
-
-"Python 还是 JS 更适合初学者？": {
-    summary: "三个模型都推荐 Python，但理由和边界条件差异显著。GPT-4o 用代码对比直观展示语法差距；Claude 没有直接下结论，先问「你想做什么」给出条件性建议；Gemini 最直接，给出具体 3 个月学习路径和资源。",
-    chips: ["共识：Python 更友好", "Claude 最负责任（条件性）", "Gemini 最可执行"],
-    models: {
-        gpt4o: {
-            tags: [{t:"有代码示例",c:"t-yellow"},{t:"对比结构",c:"t-green"},{t:"正式",c:"t-purple"},{t:"详细",c:"t-blue"}],
-            stats: { "回答长度": 80, "信息密度": 76, "正式程度": 83, "结构化": 90 },
-            keyPoint: "用真实代码对比了两种语言的 Hello World 和基本循环，直观展示 Python 语法优势，并清晰列出各自最适合的学习场景",
-            fullAnswer: `**结论：Python 更适合大多数初学者**\n\n**语法对比**\n\nPython：\n\`\`\`python\nprint("Hello World")\nfor i in range(5):\n    print(i)\n\`\`\`\n\nJavaScript：\n\`\`\`javascript\nconsole.log("Hello World");\nfor (let i = 0; i < 5; i++) {\n    console.log(i);\n}\n\`\`\`\n\nPython 的语法更接近自然语言，无大括号、无分号，缩进即结构。\n\n**选 Python 如果你想：**\n- 学数据分析、机器学习、AI\n- 科学计算或学术研究\n- 先建立编程逻辑，再决定方向\n\n**选 JavaScript 如果你想：**\n- 做网页前端开发（唯一选择）\n- 快速看到可视化结果`,
-        },
-        claude: {
-            tags: [{t:"条件性建议",c:"t-orange"},{t:"引导思考",c:"t-yellow"},{t:"温和",c:"t-blue"},{t:"适中",c:"t-green"}],
-            stats: { "回答长度": 58, "信息密度": 62, "正式程度": 52, "结构化": 60 },
-            keyPoint: "没有直接下结论，而是先问「你想做什么」，根据 4 种不同目标给出不同推荐——最负责任的方式",
-            fullAnswer: `这个问题取决于你想用编程做什么：\n\n**如果还不确定** → 选 Python。语法最接近自然思维，适合先建立编程思维框架。\n\n**如果想做网页/APP** → 选 JavaScript。前端无论如何都绕不开 JS。\n\n**如果对数据、AI 感兴趣** → 一定是 Python。这个领域 Python 几乎是唯一选择。\n\n**如果是为了找工作** → 看目标职位。前端/全栈 → JS；数据科学/AI → Python。\n\n说实话，两门语言学一门后另一门都会快很多——编程思维是通用的，语法只是工具。与其纠结，不如选一个今天就开始写第一行代码。`,
-        },
-        gemini: {
-            tags: [{t:"简洁",c:"t-green"},{t:"直接",c:"t-blue"},{t:"给学习路径",c:"t-orange"},{t:"口语化",c:"t-gray"}],
-            stats: { "回答长度": 42, "信息密度": 70, "正式程度": 30, "结构化": 65 },
-            keyPoint: "直接推荐 Python，给出「3 个月从零上手」的具体路径 + 3 个免费学习资源，最适合想立刻开始的人",
-            fullAnswer: `**Python，没有悬念。**\n\n原因：Python 写起来像说话，JavaScript 要记一堆符号。\n\n**3 个月从零上手路径：**\n- 📅 第 1 个月：基础语法（变量、循环、函数）→ CS50P（哈佛免费课）\n- 📅 第 2 个月：做 3 个小项目（计算器 / 猜数字 / 文件处理）\n- 📅 第 3 个月：选方向深入（爬虫 / 数据分析 / 自动化脚本）\n\n**3 个最好的免费资源：**\n🔗 CS50P（哈佛 Python 课，质量极高）\n🔗 Automate the Boring Stuff with Python\n🔗 freeCodeCamp Python 课程\n\n学完基础再学 JS，你会发现飞快。`,
-        },
-        deepseek: {
-            tags: [{t:"数据引用",c:"t-green"},{t:"就业视角",c:"t-purple"},{t:"客观",c:"t-gray"},{t:"详细",c:"t-blue"}],
-            stats: { "回答长度": 70, "信息密度": 80, "正式程度": 77, "结构化": 82 },
-            keyPoint: "引用 Stack Overflow 2024 调查数据，从就业市场角度客观分析，指出 Python 在 AI 时代的战略价值",
-            fullAnswer: `**综合分析：Python 更适合初学者，JS 有特定优势**\n\n**数据参考**\nStack Overflow 2024 调查：Python 连续 4 年蝉联「最受欢迎编程语言」。\n\n**Python 的优势**\n1. 语法简洁，代码量比 Java 少 60%+\n2. AI/ML/数据科学的绝对主导语言\n3. 错误信息友好，调试难度低\n\n**JavaScript 的战略优势**\n- 浏览器原生支持，前端唯一选择\n- 全栈开发性价比高\n- 就业需求量全球最高\n\n**结论**\n若无明确方向 → Python 是更低摩擦的起点。若目标明确是 Web → JS 是必学的，不如直接开始。`,
-        },
-        llama: {
-            tags: [{t:"生活类比",c:"t-yellow"},{t:"零基础友好",c:"t-orange"},{t:"亲切",c:"t-green"},{t:"适中",c:"t-blue"}],
-            stats: { "回答长度": 50, "信息密度": 58, "正式程度": 42, "结构化": 65 },
-            keyPoint: "用生活类比降低理解门槛，特别说明「如果想立刻看到效果就选 JS」，照顾到完全零基础的用户",
-            fullAnswer: `简单说：**从 Python 开始！**\n\n打个比方：\n- 🐍 Python：用你已经习惯的方式思考就能写出来\n- 🌐 JavaScript：需要记更多语法规则\n\n打印一句话：\n- Python：\`print("你好")\`\n- JS：\`console.log("你好")\`\n\n初学者少疑惑很多。\n\n**有一种情况选 JS：**\n如果你的目标就是做网页，想立刻在浏览器里看到自己做的东西——选 JS，成就感来得更快，更容易坚持。\n\n最重要的不是选哪个，是选了就真正开始，别在起跑线纠结！`,
-        }
-    }
-}
-
-}; // end placeholder (not used)
-
 // ══════════════════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════════════════
-let selected = [];
-let chosen = null;
-let currentQ = '';
-
-// ══════════════════════════════════════════════════════
-//  PREFERENCE STORAGE（localStorage）
+//  PREFS (LOCAL STORAGE)
 // ══════════════════════════════════════════════════════
 const PREF_KEY = 'modelmix_prefs';
 
 function loadPrefs() {
-    try { return JSON.parse(localStorage.getItem(PREF_KEY) || '[]'); }
-    catch { return []; }
+    try {
+        return JSON.parse(localStorage.getItem(PREF_KEY)) || [];
+    } catch {
+        return [];
+    }
 }
 
 function savePrefs(prefs) {
@@ -581,21 +1325,19 @@ function recordChoice(question, modelId) {
         modelName: MODELS.find(m => m.id === modelId)?.name || modelId,
         ts: Date.now()
     });
-    // 只保留最近 50 条
     savePrefs(prefs.slice(0, 50));
     updatePrefDot();
-    // 如果面板是开着的，刷新内容
     if (document.getElementById('prefPanel').classList.contains('open')) {
         renderPrefContent();
     }
 }
 
 function clearPrefs() {
-    if (!confirm('确认清空所有偏好记录？')) return;
+    if (!confirm('确认清空所有星球日志？')) return;
     localStorage.removeItem(PREF_KEY);
     updatePrefDot();
     renderPrefContent();
-    showToast('已清空偏好记录');
+    showToast('已清空日志');
 }
 
 function updatePrefDot() {
@@ -614,11 +1356,10 @@ function renderPrefContent() {
     const box = document.getElementById('prefContent');
 
     if (prefs.length === 0) {
-        box.innerHTML = `<div class="pref-empty">还没有偏好记录。<br>每次你选择「这个回答」后，数据就会自动积累在这里。</div>`;
+        box.innerHTML = `<div class="pref-empty">还没有日志。<br>每次你做出选择后，数据就会自动积累在这里。</div>`;
         return;
     }
 
-    // 统计各模型选择次数
     const counts = {};
     MODELS.forEach(m => counts[m.id] = 0);
     prefs.forEach(p => { if (counts[p.modelId] !== undefined) counts[p.modelId]++; });
@@ -627,30 +1368,28 @@ function renderPrefContent() {
     const favoriteId = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
     const favoriteModel = MODELS.find(m => m.id === favoriteId);
 
-    // 统计卡片
     const statsHtml = `
         <div class="pref-stats">
             <div class="pref-stat-card">
-                <div class="psc-label">总对比次数</div>
+                <div class="psc-label">探索次数</div>
                 <div class="psc-val">${totalChoices}</div>
-                <div class="psc-sub">次主动做出选择</div>
+                <div class="psc-sub">次星球选择</div>
             </div>
             <div class="pref-stat-card">
-                <div class="psc-label">最常选择</div>
+                <div class="psc-label">最爱星球</div>
                 <div class="psc-val" style="color:${favoriteModel.c}">${favoriteModel.name}</div>
                 <div class="psc-sub">共 ${counts[favoriteId]} 次（${Math.round(counts[favoriteId]/totalChoices*100)}%）</div>
             </div>
             <div class="pref-stat-card">
-                <div class="psc-label">最近一次</div>
+                <div class="psc-label">最近降落</div>
                 <div class="psc-val" style="font-size:14px;padding-top:4px;">${prefs[0].modelName}</div>
                 <div class="psc-sub">${timeAgo(prefs[0].ts)}</div>
             </div>
         </div>`;
 
-    // 模型偏好条形图
     const barsHtml = `
         <div class="pref-model-bars">
-            <div class="pmb-title">模型偏好分布</div>
+            <div class="pmb-title">星球偏好分布</div>
             ${MODELS.filter(m => counts[m.id] > 0).sort((a, b) => counts[b.id] - counts[a.id]).map(m => `
                 <div class="pmb-row">
                     <div class="pmb-name">${m.name}</div>
@@ -661,7 +1400,6 @@ function renderPrefContent() {
                 </div>`).join('')}
         </div>`;
 
-    // 历史记录（最近 8 条）
     const histHtml = `
         <div class="pref-history-title">最近选择记录</div>
         <div class="pref-history">
@@ -689,8 +1427,12 @@ function timeAgo(ts) {
 }
 
 // ══════════════════════════════════════════════════════
-//  CHIPS
+//  CHIPS & MODEL SELECTION
 // ══════════════════════════════════════════════════════
+const selected = [];
+let currentQ = '';
+let chosen = null;
+
 function init() {
     renderChips();
     updatePrefDot();
@@ -709,14 +1451,14 @@ function renderChips() {
         const chip = document.createElement('div');
         chip.className = 'model-chip' + (isSel ? ' selected' : '') + (isDisabled ? ' disabled' : '');
         chip.style.setProperty('--c', m.c);
-        chip.style.setProperty('--bg', m.bg);
+        chip.style.setProperty('--glow', m.glow);
         chip.innerHTML = `<span class="chip-dot"></span>${m.name}`;
         if (!isDisabled) chip.onclick = () => toggleChip(m.id);
         box.appendChild(chip);
     });
     const cnt = selected.length;
     document.getElementById('countBadge').textContent =
-        cnt === 0 ? '请选择模型' : cnt === 3 ? `已选 3/3 · 已达上限` : `已选 ${cnt}/3`;
+        cnt === 0 ? '请选择星球' : cnt === 3 ? `已选 3/3 · 已达上限` : `已选 ${cnt}/3`;
     document.getElementById('compareBtn').disabled = cnt === 0;
 }
 
@@ -749,7 +1491,7 @@ function startCompare() {
         return `<div class="loading-card">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
                 <div style="width:32px;height:32px;border-radius:9px;background:${m.c};display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;">${m.icon}</div>
-                <div><div style="font-weight:700;font-size:13px;">${m.name}</div><div style="font-size:11px;color:#9ca3af;">${m.org}</div></div>
+                <div><div style="font-weight:700;font-size:13px;">${m.name}</div><div style="font-size:11px;color:#94a3b8;">${m.org}</div></div>
             </div>
             <div class="skeleton" style="height:11px;width:55%;"></div>
             <div class="skeleton" style="height:11px;width:88%;"></div>
@@ -759,7 +1501,6 @@ function startCompare() {
         </div>`;
     }).join('');
 
-    // Real API call
     fetch('http://localhost:3001/api/compare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -781,10 +1522,9 @@ function startCompare() {
 }
 
 // ══════════════════════════════════════════════════════
-//  RENDER RESULTS  (takes real API response object)
+//  RENDER RESULTS
 // ══════════════════════════════════════════════════════
 function renderResults(apiData) {
-    // apiData = { results: [{modelId, content, error}], analysis: {summary, chips, models} }
     const analysis = apiData.analysis || {};
     const contentMap = {};
     (apiData.results || []).forEach(r => { contentMap[r.modelId] = r; });
@@ -792,12 +1532,11 @@ function renderResults(apiData) {
     const rs = document.getElementById('resultsSection');
     rs.style.display = 'block';
 
-    // Summary card — always shown
     const summaryEl = document.getElementById('summaryCard');
     summaryEl.style.display = '';
-    const summaryText = (analysis && analysis.summary) || '分析完成，请查看下方各模型回答。';
+    const summaryText = (analysis && analysis.summary) || '探索完成，请查看下方各星球回答。';
     const chips = (analysis && analysis.chips) || [];
-    const eyebrow = selected.length === 1 ? '📋 分析总览' : '🔍 差异总结';
+    const eyebrow = selected.length === 1 ? '📋 星球概览' : '🔍 差异总结';
     summaryEl.innerHTML = `
         <div class="summary-eyebrow">${eyebrow}</div>
         <div class="summary-text">${summaryText}</div>
@@ -812,15 +1551,12 @@ function renderResults(apiData) {
         const resultEntry = contentMap[id] || {};
         const modelAnalysis = (analysis.models && analysis.models[id]) || {};
 
-        // Build tags from real API: [{label, type}] → [{t, c}]
         const tags = (modelAnalysis.tags || []).map(tag => ({
             t: tag.label,
             c: tagClass(tag.type)
         }));
 
-        // Stats from real API: {创意度: 80, ...}
         const stats = modelAnalysis.stats || {};
-
         const keyPoint = modelAnalysis.keyPoint || '';
         const fullAnswer = resultEntry.error
             ? `⚠️ 请求失败：${resultEntry.error}`
@@ -832,6 +1568,7 @@ function renderResults(apiData) {
         col.style.setProperty('--c', m.c);
         col.style.setProperty('--bg', m.bg);
         col.style.setProperty('--shadow', m.shadow);
+        col.style.setProperty('--glow', m.glow);
 
         const statsHtml = Object.keys(stats).length > 0
             ? `<div class="stats-grid">${Object.entries(stats).map(([k,v])=>`
@@ -847,7 +1584,6 @@ function renderResults(apiData) {
         const isSingleModel = selected.length === 1;
         const hasError = !!resultEntry.error;
 
-        // Error state: show error prominently, hide analysis
         if (hasError) {
             col.innerHTML = `
                 <div class="col-header">
@@ -858,8 +1594,8 @@ function renderResults(apiData) {
                 </div>
                 <div style="padding:24px 20px;text-align:center;">
                     <div style="font-size:28px;margin-bottom:8px;">⚠️</div>
-                    <div style="font-size:13px;color:#ef4444;font-weight:600;margin-bottom:4px;">请求失败</div>
-                    <div style="font-size:12px;color:#9ca3af;">${resultEntry.error}</div>
+                    <div style="font-size:13px;color:#fca5a5;font-weight:600;margin-bottom:4px;">请求失败</div>
+                    <div style="font-size:12px;color:#64748b;">${resultEntry.error}</div>
                 </div>`;
         } else {
             col.innerHTML = `
@@ -903,6 +1639,7 @@ function fmt(raw) {
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         .replace(/\n/g, '<br>');
 }
+
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ══════════════════════════════════════════════════════
@@ -927,11 +1664,10 @@ function chooseModel(id) {
     document.getElementById(`selbtn-${id}`).textContent = '✓ 已选择';
     chosen = id;
 
-    // ★ 记录偏好
     recordChoice(currentQ, id);
 
     const m = MODELS.find(x => x.id === id);
-    document.getElementById('postBarText').innerHTML = `你选择了 <strong>${m.name}</strong> 的回答 · 接下来？`;
+    document.getElementById('postBarText').innerHTML = `已降落在 <strong>${m.name}</strong> 星球 · 接下来？`;
     document.getElementById('deepDiveBtn').textContent = `进入 ${m.name} 深聊 →`;
     document.getElementById('postBar').classList.add('show');
     setTimeout(() => document.getElementById('postBar').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
@@ -942,14 +1678,14 @@ function continueAll() {
     document.getElementById('postBar').classList.remove('show');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('queryInput').focus();
-    showToast('已清空，输入新问题继续对比 ✓');
+    showToast('已清空，继续探索其他星球 ✓');
 }
 
 // ══════════════════════════════════════════════════════
 //  DEEP CHAT
 // ══════════════════════════════════════════════════════
 let chatModel = null;
-let chatHistory = []; // [{role: 'user'|'assistant', content}]
+let chatHistory = [];
 
 function deepDive() {
     if (!chosen) return;
@@ -962,7 +1698,6 @@ function deepDive() {
     document.getElementById('chatModelName').textContent = `与 ${m.name} 深聊`;
     document.getElementById('chatModelOrg').textContent = m.org;
 
-    // Seed chat with original question + model's first answer
     const firstAnswer = document.getElementById(`answer-${chatModel}`)?.innerText || '';
     chatHistory.push({ role: 'user', content: currentQ });
     chatHistory.push({ role: 'assistant', content: firstAnswer });
@@ -972,7 +1707,6 @@ function deepDive() {
     addChatBubble('user', currentQ);
     addChatBubble('assistant', firstAnswer);
 
-    // Hide compare view, show chat
     document.getElementById('resultsSection').style.display = 'none';
     document.querySelector('.query-section').style.display = 'none';
     document.getElementById('chatSection').classList.add('show');
@@ -1006,7 +1740,6 @@ async function sendChat() {
     chatHistory.push({ role: 'user', content: msg });
     addChatBubble('user', msg);
 
-    // Show typing indicator
     const typing = document.createElement('div');
     typing.className = 'chat-bubble assistant chat-typing';
     typing.textContent = '思考中…';
