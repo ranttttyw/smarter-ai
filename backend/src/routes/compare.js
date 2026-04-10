@@ -4,6 +4,7 @@ const { queryOpenAI } = require('../clients/openai');
 const { queryClaude } = require('../clients/anthropic');
 const { queryGemini } = require('../clients/gemini');
 const { queryDeepSeek } = require('../clients/deepseek');
+const { queryGLM } = require('../clients/glm');
 const { analyzeResults } = require('../analysis/analyze');
 
 // Map model id → actual query function
@@ -12,6 +13,7 @@ const MODEL_HANDLERS = {
   claude: queryClaude,
   gemini: queryGemini,
   deepseek: queryDeepSeek,
+  glm: queryGLM,
 };
 
 // POST /api/compare
