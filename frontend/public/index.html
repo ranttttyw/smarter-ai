@@ -1210,6 +1210,14 @@
             margin-bottom: 24px;
         }
 
+        .radar-section {
+            background: rgba(15, 10, 40, 0.4);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
         .pmb-title {
             font-size: 12px;
             font-weight: 700;
@@ -1793,7 +1801,184 @@ function renderPrefContent() {
             }).join('')}
         </div>`;
 
-    box.innerHTML = statsHtml + barsHtml + histHtml;
+    // Build radar chart from reactions data
+    const radarHtml = buildRadarSection(prefs);
+
+    box.innerHTML = statsHtml + radarHtml + barsHtml + histHtml;
+
+    // Draw radar chart after DOM insert
+    setTimeout(() => drawRadarChart(prefs), 50);
+}
+
+function buildRadarSection(prefs) {
+    return `
+        <div class="radar-section">
+            <div class="pmb-title">你的星际人格</div>
+            <canvas id="radarCanvas" width="280" height="280" style="display:block;margin:0 auto 12px;"></canvas>
+            <div id="personaLabel" style="text-align:center;font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:4px;"></div>
+            <div id="personaDesc" style="text-align:center;font-size:11px;color:#94a3b8;line-height:1.5;"></div>
+        </div>`;
+}
+
+function drawRadarChart(prefs) {
+    const canvas = document.getElementById('radarCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const cx = W / 2, cy = H / 2;
+    const R = 110;
+
+    // Compute personality dimensions from choices + reactions
+    const reactions = (() => {
+        try { return JSON.parse(localStorage.getItem(REACTIONS_KEY)) || []; }
+        catch { return []; }
+    })();
+
+    // 6 personality dimensions (0-100)
+    const dims = {
+        '深度思考': 50,   // prefers thoughtful/philosophical answers
+        '实用主义': 50,   // prefers practical/useful answers
+        '创意追求': 50,   // prefers creative/unique answers
+        '情感共鸣': 50,   // connects emotionally with answers
+        '探索精神': 50,   // tries different models
+        '审美偏好': 50,   // cares about writing quality
+    };
+
+    // Analyze reaction patterns
+    const reactionMap = {
+        '💡 说到心坎里了': { '情感共鸣': 20, '深度思考': 10 },
+        '🌊 写得比我好': { '审美偏好': 20, '创意追求': 10 },
+        '🧠 角度很独特': { '创意追求': 15, '深度思考': 15 },
+        '🎯 就是我想要的': { '实用主义': 20, '审美偏好': 5 },
+        '😶 另一个更差': { '实用主义': 10 },
+        '✨ 想继续聊聊': { '深度思考': 15, '情感共鸣': 10, '探索精神': 5 },
+    };
+
+    reactions.forEach(r => {
+        const boosts = reactionMap[r.reaction];
+        if (boosts) {
+            Object.entries(boosts).forEach(([dim, val]) => {
+                dims[dim] = Math.min(100, dims[dim] + val);
+            });
+        }
+    });
+
+    // Exploration spirit: based on model diversity
+    const modelSet = new Set(prefs.map(p => p.modelId));
+    dims['探索精神'] = Math.min(100, dims['探索精神'] + modelSet.size * 15);
+
+    // Analyze question patterns for depth vs practical
+    prefs.forEach(p => {
+        const q = p.question || '';
+        if (/意义|哲学|人生|自由|孤独|价值|灵魂|思考/.test(q)) {
+            dims['深度思考'] = Math.min(100, dims['深度思考'] + 5);
+        }
+        if (/写|邮件|文案|介绍|文档|报告/.test(q)) {
+            dims['实用主义'] = Math.min(100, dims['实用主义'] + 5);
+        }
+    });
+
+    // Cap all at 100
+    Object.keys(dims).forEach(k => dims[k] = Math.min(100, dims[k]));
+
+    const labels = Object.keys(dims);
+    const values = Object.values(dims);
+    const n = labels.length;
+
+    // Draw background circles
+    ctx.clearRect(0, 0, W, H);
+    [0.25, 0.5, 0.75, 1].forEach(scale => {
+        ctx.beginPath();
+        for (let i = 0; i <= n; i++) {
+            const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+            const x = cx + Math.cos(angle) * R * scale;
+            const y = cy + Math.sin(angle) * R * scale;
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(167, 139, 250, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    });
+
+    // Draw axis lines
+    for (let i = 0; i < n; i++) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(angle) * R, cy + Math.sin(angle) * R);
+        ctx.strokeStyle = 'rgba(167, 139, 250, 0.12)';
+        ctx.stroke();
+    }
+
+    // Draw data polygon
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+        const idx = i % n;
+        const angle = (Math.PI * 2 * idx / n) - Math.PI / 2;
+        const r = (values[idx] / 100) * R;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+    grad.addColorStop(0, 'rgba(139, 92, 246, 0.35)');
+    grad.addColorStop(1, 'rgba(59, 130, 246, 0.15)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(167, 139, 250, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw dots on vertices
+    for (let i = 0; i < n; i++) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        const r = (values[i] / 100) * R;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#a78bfa';
+        ctx.fill();
+        ctx.strokeStyle = '#1e1b4b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    // Draw labels
+    ctx.font = '11px -apple-system, sans-serif';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i < n; i++) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        const lx = cx + Math.cos(angle) * (R + 22);
+        const ly = cy + Math.sin(angle) * (R + 22);
+        ctx.fillText(`${labels[i]} ${values[i]}`, lx, ly);
+    }
+
+    // Generate persona type based on dominant dims
+    const sorted = Object.entries(dims).sort((a, b) => b[1] - a[1]);
+    const top2 = sorted.slice(0, 2).map(d => d[0]);
+    const personaTypes = {
+        '深度思考+情感共鸣': { label: '🌌 浪漫哲学家', desc: '你喜欢有深度的思考，也在乎内心的共鸣。你选择的不只是答案，而是一种理解世界的方式。' },
+        '情感共鸣+深度思考': { label: '🌌 浪漫哲学家', desc: '你喜欢有深度的思考，也在乎内心的共鸣。你选择的不只是答案，而是一种理解世界的方式。' },
+        '实用主义+审美偏好': { label: '🎯 优雅实干家', desc: '你追求效率，但拒绝粗糙。你要的是既好用又好看的答案。' },
+        '审美偏好+实用主义': { label: '🎯 优雅实干家', desc: '你追求效率，但拒绝粗糙。你要的是既好用又好看的答案。' },
+        '创意追求+探索精神': { label: '🚀 星际探险家', desc: '你总是好奇不同的视角，愿意尝试新模型、新可能。你享受发现的过程。' },
+        '探索精神+创意追求': { label: '🚀 星际探险家', desc: '你总是好奇不同的视角，愿意尝试新模型、新可能。你享受发现的过程。' },
+        '深度思考+创意追求': { label: '🔮 灵感捕手', desc: '你被独特的角度吸引，在深层思考中寻找创造力的火花。' },
+        '创意追求+深度思考': { label: '🔮 灵感捕手', desc: '你被独特的角度吸引，在深层思考中寻找创造力的火花。' },
+        '实用主义+深度思考': { label: '🧭 理性导航者', desc: '你重视实用性，但也渴望理解本质。你在效率和深度之间找到了平衡。' },
+        '深度思考+实用主义': { label: '🧭 理性导航者', desc: '你重视实用性，但也渴望理解本质。你在效率和深度之间找到了平衡。' },
+    };
+
+    const key = top2.join('+');
+    const persona = personaTypes[key] || { label: '✨ 星际旅行者', desc: '你的偏好均衡而多元，就像在宇宙中自由穿行，不被任何星球束缚。' };
+
+    document.getElementById('personaLabel').textContent = persona.label;
+    document.getElementById('personaDesc').textContent = persona.desc;
 }
 
 // ══════════════════════════════════════════════════════
@@ -2049,7 +2234,10 @@ function chooseModel(id) {
     selected.forEach(sid => {
         document.getElementById(`col-${sid}`)?.classList.remove('is-selected');
         const b = document.getElementById(`selbtn-${sid}`);
-        if (b) b.textContent = '选择这个回答';
+        if (b) { b.textContent = '选择这个回答'; b.disabled = false; }
+        // Remove old reaction panels
+        const oldPanel = document.getElementById(`col-${sid}`)?.querySelector('.reactions-panel');
+        if (oldPanel) oldPanel.remove();
     });
     document.getElementById(`col-${id}`).classList.add('is-selected');
     const btn = document.getElementById(`selbtn-${id}`);
@@ -2093,12 +2281,24 @@ function reactAndClose(modelId, reaction) {
     const comment = document.getElementById(`reaction-comment-${modelId}`)?.value || '';
     recordReaction(currentQ, modelId, reaction, comment);
     showToast('已记录你的想法 ✓');
-    closeReactionsPanel(modelId);
+    showDeepChatOnly(modelId);
 }
 
 function closeReactionsPanel(modelId) {
-    const panel = document.getElementById(`col-${modelId}`)?.querySelector('.reactions-panel');
-    if (panel) panel.remove();
+    // Skip → still show deep chat button
+    showDeepChatOnly(modelId);
+}
+
+function showDeepChatOnly(modelId) {
+    const card = document.getElementById(`col-${modelId}`);
+    const panel = card?.querySelector('.reactions-panel');
+    if (!panel) return;
+    const m = MODELS.find(x => x.id === modelId);
+    panel.innerHTML = `
+        <div class="reaction-footer" style="justify-content:center;">
+            <button class="deepchat-btn" style="background:${m.c};width:100%;" onclick="deepDive('${modelId}')">进入 ${m.name} 深聊 →</button>
+        </div>
+    `;
 }
 
 // ══════════════════════════════════════════════════════
