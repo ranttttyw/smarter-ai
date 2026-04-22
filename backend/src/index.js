@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve frontend static files
-app.use(express.static(path.join(__dirname, '../../frontend/public')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // API Routes
 app.use('/api', compareRoute);
@@ -23,7 +23,7 @@ app.get('/health', (req, res) => {
 
 // Fallback: serve index.html for any non-API route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/public/index.html'));
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 app.listen(PORT, () => {
