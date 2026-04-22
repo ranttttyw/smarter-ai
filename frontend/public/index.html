@@ -2118,7 +2118,7 @@ function startCompare() {
         </div>`;
     }).join('');
 
-    fetch('http://localhost:3001/api/compare', {
+    fetch('/api/compare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: q, models: selected })
@@ -2411,7 +2411,7 @@ async function sendChat() {
     document.getElementById('chatSendBtn').disabled = true;
 
     try {
-        const res = await fetch('http://localhost:3001/api/chat', {
+        const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: chatModel, messages: chatHistory })
