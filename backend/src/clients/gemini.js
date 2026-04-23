@@ -3,7 +3,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function queryGemini(prompt) {
-  const model = client.getGenerativeModel({ model: 'gemini-2.0-flash-001-001' });
+  const model = client.getGenerativeModel({ model: 'gemini-2.5-flash-001' });
   const result = await model.generateContent(prompt);
   return result.response.text();
 }
